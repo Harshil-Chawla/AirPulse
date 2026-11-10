@@ -15,3 +15,16 @@ export const getAllStations = async () => {
 
     return stations;
 };
+
+export const getStationReadings = async (stationId) => {
+    const readings = await prisma.reading.findMany({
+        where: {
+            stationId: stationId,
+        },
+        orderBy: {
+            recordedAt: "desc",
+        },
+    });
+
+    return readings;
+};
