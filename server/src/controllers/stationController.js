@@ -2,7 +2,9 @@
 import {
     getAllStations,
     getStationReadings,
+    simulateMobileMovement
 } from "../services/stationService.js";
+
 
 export const fetchStations = async (req, res) => {
     try {
@@ -51,4 +53,32 @@ export const fetchStationReadings = async (req, res) => {
             message: "Failed to fetch station readings",
         });
     }
+};
+
+export const moveMobileStation = async (req, res) => {
+  try {
+    const stationId = Number(req.params.id);
+
+    if (!Number.isInteger(stationId) || stationId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid station ID",
+      });
+    }
+
+    const reading = await simulateMobileMovement(stationId);
+
+    return res.status(201).json({
+      success: true,
+      message: "Simulated movement recorded",
+      reading,
+    });
+  } catch (error) {
+    const status = error.message === "Station not found" ? 404 : 400;
+
+    return res.status(status).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
