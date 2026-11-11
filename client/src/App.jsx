@@ -1,12 +1,13 @@
 
-import StationMap from "./components/StationMap";
 import { useEffect, useState } from "react";
 
 import "./App.css";
 
+import StationMap from "./components/StationMap";
+import MapLegend from "./components/MapLegend";
 import AQIChart from "./components/AQIChart";
-
 import AQICategoryLegend from "./components/AQICategoryLegend";
+import StationComparison from "./components/StationComparison";
 
 import {
     fetchStations,
@@ -14,7 +15,6 @@ import {
     fetchStationReadings,
 } from "./services/stationApi";
 
-import StationComparison from "./components/StationComparison";
 
 function getAQIStatus(aqi) {
     if (aqi === null || aqi === undefined) {
@@ -29,6 +29,7 @@ function getAQIStatus(aqi) {
 
     return { label: "Severe", className: "severe" };
 }
+
 
 function App() {
     const [stations, setStations] = useState([]);
@@ -192,13 +193,58 @@ function App() {
     };
 
     const pollutants = [
-        { name: "PM2.5", key: "pm25", unit: "µg/m³", description: "Fine particles" },
-        { name: "PM10", key: "pm10", unit: "µg/m³", description: "Coarse particles" },
-        { name: "NO₂", key: "no2", unit: "µg/m³", description: "Nitrogen dioxide" },
-        { name: "SO₂", key: "so2", unit: "µg/m³", description: "Sulphur dioxide" },
-        { name: "CO", key: "co", unit: "mg/m³", description: "Carbon monoxide" },
-        { name: "O₃", key: "o3", unit: "µg/m³", description: "Ozone" },
+        {
+            name: "PM2.5",
+            key: "pm25",
+            unit: "µg/m³",
+            description: "Fine particles",
+        },
+        {
+            name: "PM10",
+            key: "pm10",
+            unit: "µg/m³",
+            description: "Coarse particles",
+        },
+        {
+            name: "NO₂",
+            key: "no2",
+            unit: "µg/m³",
+            description: "Nitrogen dioxide",
+        },
+        {
+            name: "SO₂",
+            key: "so2",
+            unit: "µg/m³",
+            description: "Sulphur dioxide",
+        },
+        {
+            name: "CO",
+            key: "co",
+            unit: "mg/m³",
+            description: "Carbon monoxide",
+        },
+        {
+            name: "O₃",
+            key: "o3",
+            unit: "µg/m³",
+            description: "Ozone",
+        },
     ];
+
+    // Filter monitoring stations
+    const filteredStations =
+        stationFilter === "ALL"
+            ? stations
+            : stations.filter(
+                (station) => station.type === stationFilter
+            );
+
+    // Find selected station
+    const selectedStation = stations.find(
+        (station) => String(station.id) === String(selectedStationId)
+    );
+
+    const selectedReading = selectedStation?.readings?.[0];
 
     if (loading) {
         return (
@@ -220,17 +266,6 @@ function App() {
             </div>
         );
     }
-    const filteredStations =
-    stationFilter === "ALL"
-        ? stations
-        : stations.filter(
-              (station) => station.type === stationFilter
-          );
-    const selectedStation = stations.find(
-    (station) => station.id === selectedStationId
-    );
-
-    const selectedReading = selectedStation?.readings?.[0];
 
     return (
         <div className="app-layout">
@@ -305,7 +340,9 @@ function App() {
                     <div className="aqi-panel">
                         <div className="panel-heading">
                             <div>
-                                <span className="eyebrow">AIR QUALITY OVERVIEW</span>
+                                <span className="eyebrow">
+                                    AIR QUALITY OVERVIEW
+                                </span>
                                 <h2>Highest Station AQI</h2>
                             </div>
                             <span className="aqi-icon">◉</span>
@@ -379,6 +416,7 @@ function App() {
                     </div>
                 </section>
 
+                {/* AQI Categories */}
                 <div className="section-block">
                     <div className="section-heading">
                         <div>
@@ -404,7 +442,10 @@ function App() {
 
                     <div className="pollutant-grid">
                         {pollutants.map((pollutant) => (
-                            <article className="pollutant-card" key={pollutant.key}>
+                            <article
+                                className="pollutant-card"
+                                key={pollutant.key}
+                            >
                                 <div className="pollutant-card-top">
                                     <span className="pollutant-name">
                                         {pollutant.name}
@@ -426,234 +467,292 @@ function App() {
                     </div>
                 </section>
 
-                        <section className="section-block" id="history">
-    <div className="section-heading">
-        <div>
-            <span className="eyebrow">HISTORICAL ANALYTICS</span>
-            <h2>AQI History</h2>
-        </div>
-        <span className="section-note">Recorded station readings</span>
-    </div>
-
-    <div className="history-controls">
-        <label htmlFor="station-history">Select station</label>
-
-        <select
-            id="station-history"
-            value={selectedStationId}
-            onChange={(e) => setSelectedStationId(e.target.value)}
-        >
-            {stations.map((station) => (
-                <option key={station.id} value={station.id}>
-                    {station.name}
-                </option>
-            ))}
-        </select>
-    </div>
-
-    {historyLoading ? (
-        <p>Loading historical readings...</p>
-    ) : historyError ? (
-        <p className="history-error">{historyError}</p>
-    ) : (
-        <AQIChart readings={historicalReadings} />
-    )}
-</section>
-
-<section className="section-block" id="comparison">
-    <div className="section-heading">
-        <div>
-            <span className="eyebrow">STATION ANALYTICS</span>
-            <h2>Fixed vs Mobile Comparison</h2>
-        </div>
-        <span className="section-note">
-            Latest AQI readings
-        </span>
-    </div>
-
-    <StationComparison stations={stations} />
-</section>
-                {/* Station Map */}
-               
-<section className="section-block">
-    <div className="section-heading">
-        <div>
-            <span className="eyebrow">GEOGRAPHIC INTELLIGENCE</span>
-            <h2>Live Station Map</h2>
-        </div>
-        <span className="section-note">
-            {stations.length} mapped locations
-        </span>
-    </div>
-
-    <button
-        className="movement-button"
-        onClick={handleMoveMobileStation}
-        disabled={moving || mobileCount === 0}
-    >
-        {moving ? "Moving station..." : "Simulate Mobile Movement"}
-    </button>
-
-    {movementError && (
-        <p className="movement-error">{movementError}</p>
-    )}
-
-    <StationMap stations={stations} />
-</section>
-
-
-<section className="station-details-section">
-    <div className="section-heading">
-        <div>
-            <h2>Station Details</h2>
-            <p>Detailed pollutant readings for the selected station</p>
-        </div>
-    </div>
-
-    {selectedStation && selectedReading ? (
-        <>
-            <div className="station-details-header">
-                <h3>{selectedStation.name}</h3>
-                <span className="station-type">
-                    {selectedStation.type}
-                </span>
-            </div>
-
-            <div className="pollutant-details-grid">
-                {[
-                    { name: "PM2.5", key: "pm25", unit: "µg/m³" },
-                    { name: "PM10", key: "pm10", unit: "µg/m³" },
-                    { name: "NO₂", key: "no2", unit: "µg/m³" },
-                    { name: "SO₂", key: "so2", unit: "µg/m³" },
-                    { name: "CO", key: "co", unit: "mg/m³" },
-                    { name: "O₃", key: "o3", unit: "µg/m³" },
-                ].map((pollutant) => (
-                    <div className="pollutant-detail-card" key={pollutant.key}>
-                        <span>{pollutant.name}</span>
-                        <strong>
-                            {selectedReading[pollutant.key] ?? "N/A"}
-                        </strong>
-                        <small>{pollutant.unit}</small>
+                {/* AQI History */}
+                <section className="section-block" id="history">
+                    <div className="section-heading">
+                        <div>
+                            <span className="eyebrow">
+                                HISTORICAL ANALYTICS
+                            </span>
+                            <h2>AQI History</h2>
+                        </div>
+                        <span className="section-note">
+                            Recorded station readings
+                        </span>
                     </div>
-                ))}
-            </div>
-        </>
-    ) : (
-        <p>No station readings available.</p>
-    )}
-</section>
+
+                    <div className="history-controls">
+                        <label htmlFor="station-history">
+                            Select station
+                        </label>
+
+                        <select
+                            id="station-history"
+                            value={selectedStationId}
+                            onChange={(e) =>
+                                setSelectedStationId(e.target.value)
+                            }
+                        >
+                            {stations.map((station) => (
+                                <option
+                                    key={station.id}
+                                    value={station.id}
+                                >
+                                    {station.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {historyLoading ? (
+                        <p>Loading historical readings...</p>
+                    ) : historyError ? (
+                        <p className="history-error">{historyError}</p>
+                    ) : (
+                        <AQIChart readings={historicalReadings} />
+                    )}
+                </section>
+
+                {/* Fixed vs Mobile Comparison */}
+                <section className="section-block" id="comparison">
+                    <div className="section-heading">
+                        <div>
+                            <span className="eyebrow">
+                                STATION ANALYTICS
+                            </span>
+                            <h2>Fixed vs Mobile Comparison</h2>
+                        </div>
+                        <span className="section-note">
+                            Latest AQI readings
+                        </span>
+                    </div>
+
+                    <StationComparison stations={stations} />
+                </section>
+
+                {/* Station Map */}
+                <section className="section-block" id="map">
+                    <div className="section-heading">
+                        <div>
+                            <span className="eyebrow">
+                                GEOGRAPHIC INTELLIGENCE
+                            </span>
+                            <h2>Live Station Map</h2>
+                        </div>
+
+                        <span className="section-note">
+                            {stations.length} mapped locations
+                        </span>
+                    </div>
+
+                    <button
+                        className="movement-button"
+                        onClick={handleMoveMobileStation}
+                        disabled={moving || mobileCount === 0}
+                    >
+                        {moving
+                            ? "Moving station..."
+                            : "Simulate Mobile Movement"}
+                    </button>
+
+                    {movementError && (
+                        <p className="movement-error">{movementError}</p>
+                    )}
+
+                    <MapLegend />
+
+                    <StationMap stations={stations} />
+                </section>
+
+                {/* Station Details */}
+                <section className="station-details-section">
+                    <div className="section-heading">
+                        <div>
+                            <h2>Station Details</h2>
+                            <p>
+                                Detailed pollutant readings for the selected station
+                            </p>
+                        </div>
+                    </div>
+
+                    {selectedStation && selectedReading ? (
+                        <>
+                            <div className="station-details-header">
+                                <h3>{selectedStation.name}</h3>
+                                <span className="station-type">
+                                    {selectedStation.type}
+                                </span>
+                            </div>
+
+                            <div className="pollutant-details-grid">
+                                {pollutants.map((pollutant) => (
+                                    <div
+                                        className="pollutant-detail-card"
+                                        key={pollutant.key}
+                                    >
+                                        <span>{pollutant.name}</span>
+                                        <strong>
+                                            {selectedReading[pollutant.key] ?? "N/A"}
+                                        </strong>
+                                        <small>{pollutant.unit}</small>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    ) : (
+                        <p>No station readings available.</p>
+                    )}
+                </section>
 
                 {/* Monitoring Stations */}
 
-<section className="monitoring-section">
-    <div className="section-heading">
-        <div>
-            <h2>Monitoring Stations</h2>
-            <p>{filteredStations.length} stations registered</p>
-        </div>
-    </div>
-
-    <div className="station-filters">
-        <button
-            className={stationFilter === "ALL" ? "active" : ""}
-            onClick={() => setStationFilter("ALL")}
-        >
-            All
-        </button>
-
-        <button
-            className={stationFilter === "FIXED" ? "active" : ""}
-            onClick={() => setStationFilter("FIXED")}
-        >
-            Fixed
-        </button>
-
-        <button
-            className={stationFilter === "MOBILE" ? "active" : ""}
-            onClick={() => setStationFilter("MOBILE")}
-        >
-            Mobile
-        </button>
-
-        <button
-            className={stationFilter === "DRONE" ? "active" : ""}
-            onClick={() => setStationFilter("DRONE")}
-        >
-            Drone
-        </button>
-    </div>
-
-    <div className="station-list">
-        {filteredStations.length === 0 ? (
-            <p>No stations found for this filter.</p>
-        ) : (
-            filteredStations.map((station) => {
-                const reading = station.readings?.[0];
-                const status = getAQIStatus(reading?.aqi);
-
-                return (
-                    <article
-                        className={`station-row ${
-                            selectedStationId === station.id ? "selected" : ""
-                        }`}
-                        key={station.id}
-                        onClick={() => setSelectedStationId(station.id)}
-                    >
-                        <div className="station-info">
-                            <h3>{station.name}</h3>
-                            <p>{station.city}, India</p>
-                            <span className="station-type">
-                                {station.type}
-                            </span>
+                <section className="monitoring-section" id="stations">
+                    <div className="section-heading">
+                        <div>
+                            <h2>Monitoring Stations</h2>
+                            <p>
+                                {filteredStations.length} stations registered
+                            </p>
                         </div>
+                    </div>
 
-                        <div className="station-aqi-column">
-                            <span className="column-label">AQI</span>
-                            <strong>{reading?.aqi ?? "N/A"}</strong>
-                            <span className={`mini-status ${status.className}`}>
-                                {status.label}
-                            </span>
-                        </div>
+                    <div className="station-filters">
+                        <button
+                            className={
+                                stationFilter === "ALL" ? "active" : ""
+                            }
+                            onClick={() => setStationFilter("ALL")}
+                        >
+                            All
+                        </button>
 
-                        <div className="station-pollutants">
-                            <span className="column-label">PM2.5</span>
-                            <strong>{reading?.pm25 ?? "N/A"}</strong>
-                            <small>µg/m³</small>
-                        </div>
+                        <button
+                            className={
+                                stationFilter === "FIXED" ? "active" : ""
+                            }
+                            onClick={() => setStationFilter("FIXED")}
+                        >
+                            Fixed
+                        </button>
 
-                        <div className="station-pollutants">
-                            <span className="column-label">PM10</span>
-                            <strong>{reading?.pm10 ?? "N/A"}</strong>
-                            <small>µg/m³</small>
-                        </div>
+                        <button
+                            className={
+                                stationFilter === "MOBILE" ? "active" : ""
+                            }
+                            onClick={() => setStationFilter("MOBILE")}
+                        >
+                            Mobile
+                        </button>
 
-                        <div className="station-source">
-                            <span className="column-label">DATA SOURCE</span>
-                            <span className="source-badge">
-                                {reading?.source ?? "N/A"}
-                            </span>
-                        </div>
+                        <button
+                            className={
+                                stationFilter === "DRONE" ? "active" : ""
+                            }
+                            onClick={() => setStationFilter("DRONE")}
+                        >
+                            Drone
+                        </button>
+                    </div>
 
-                        <div className="station-time-column">
-                            <span className="column-label">LAST UPDATED</span>
-                            <span>
-                                {reading?.recordedAt
-                                    ? new Date(reading.recordedAt).toLocaleString()
-                                    : "N/A"}
-                            </span>
-                        </div>
-                    </article>
-                );
-            })
-        )}
-    </div>
-</section>
+                    <div className="station-list">
+                        {filteredStations.length === 0 ? (
+                            <p>No stations found for this filter.</p>
+                        ) : (
+                            filteredStations.map((station) => {
+                                const reading = station.readings?.[0];
+                                const status = getAQIStatus(reading?.aqi);
 
+                                return (
+                                    <article
+                                        className={`station-row ${
+                                            String(selectedStationId) ===
+                                            String(station.id)
+                                                ? "selected"
+                                                : ""
+                                        }`}
+                                        key={station.id}
+                                        onClick={() =>
+                                            setSelectedStationId(
+                                                String(station.id)
+                                            )
+                                        }
+                                    >
+                                        <div className="station-info">
+                                            <h3>{station.name}</h3>
+                                            <p>{station.city}, India</p>
+                                            <span className="station-type">
+                                                {station.type}
+                                            </span>
+                                        </div>
+
+                                        <div className="station-aqi-column">
+                                            <span className="column-label">
+                                                AQI
+                                            </span>
+                                            <strong>
+                                                {reading?.aqi ?? "N/A"}
+                                            </strong>
+                                            <span
+                                                className={`mini-status ${status.className}`}
+                                            >
+                                                {status.label}
+                                            </span>
+                                        </div>
+
+                                        <div className="station-pollutants">
+                                            <span className="column-label">
+                                                PM2.5
+                                            </span>
+                                            <strong>
+                                                {reading?.pm25 ?? "N/A"}
+                                            </strong>
+                                            <small>µg/m³</small>
+                                        </div>
+
+                                        <div className="station-pollutants">
+                                            <span className="column-label">
+                                                PM10
+                                            </span>
+                                            <strong>
+                                                {reading?.pm10 ?? "N/A"}
+                                            </strong>
+                                            <small>µg/m³</small>
+                                        </div>
+
+                                        <div className="station-source">
+                                            <span className="column-label">
+                                                DATA SOURCE
+                                            </span>
+                                            <span className="source-badge">
+                                                {reading?.source ?? "N/A"}
+                                            </span>
+                                        </div>
+
+                                        <div className="station-time-column">
+                                            <span className="column-label">
+                                                LAST UPDATED
+                                            </span>
+                                            <span>
+                                                {reading?.recordedAt
+                                                    ? new Date(
+                                                        reading.recordedAt
+                                                    ).toLocaleString()
+                                                    : "N/A"}
+                                            </span>
+                                        </div>
+                                    </article>
+                                );
+                            })
+                        )}
+                    </div>
+                </section>
 
                 {/* Footer */}
                 <footer className="dashboard-footer">
                     <span>AirPulse Environmental Intelligence</span>
-                    <span>Data displayed from registered monitoring stations</span>
+                    <span>
+                        Data displayed from registered monitoring stations
+                    </span>
                 </footer>
 
             </main>
