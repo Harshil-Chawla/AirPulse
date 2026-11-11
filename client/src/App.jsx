@@ -92,6 +92,30 @@ function App() {
     };
 }, [selectedStationId]);
 
+
+useEffect(() => {
+    const refreshDashboard = async () => {
+        try {
+            const updatedStations = await fetchStations();
+            setStations(updatedStations);
+
+            if (selectedStationId) {
+                const updatedHistory = await fetchStationReadings(
+                    selectedStationId
+                );
+                setHistoricalReadings(updatedHistory);
+            }
+        } catch (err) {
+            console.error("Dashboard refresh failed:", err);
+        }
+    };
+
+    const intervalId = setInterval(refreshDashboard, 30000);
+
+    return () => {
+        clearInterval(intervalId);
+    };
+}, [selectedStationId]);
     
 const handleMoveMobileStation = async () => {
     // Find the mobile station
