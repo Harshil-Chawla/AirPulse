@@ -32,6 +32,7 @@ function getAQIStatus(aqi) {
 
 function App() {
     const [stations, setStations] = useState([]);
+    const [stationFilter, setStationFilter] = useState("ALL");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [movementError, setMovementError] = useState("");
@@ -219,6 +220,12 @@ function App() {
             </div>
         );
     }
+    const filteredStations =
+    stationFilter === "ALL"
+        ? stations
+        : stations.filter(
+              (station) => station.type === stationFilter
+          );
 
     return (
         <div className="app-layout">
@@ -490,82 +497,105 @@ function App() {
 </section>
 
                 {/* Monitoring Stations */}
-                <section className="section-block" id="stations">
-                    <div className="section-heading">
-                        <div>
-                            <span className="eyebrow">SENSOR NETWORK</span>
-                            <h2>Monitoring Stations</h2>
+
+<section className="monitoring-section">
+    <div className="section-heading">
+        <div>
+            <h2>Monitoring Stations</h2>
+            <p>{filteredStations.length} stations registered</p>
+        </div>
+    </div>
+
+    <div className="station-filters">
+        <button
+            className={stationFilter === "ALL" ? "active" : ""}
+            onClick={() => setStationFilter("ALL")}
+        >
+            All
+        </button>
+
+        <button
+            className={stationFilter === "FIXED" ? "active" : ""}
+            onClick={() => setStationFilter("FIXED")}
+        >
+            Fixed
+        </button>
+
+        <button
+            className={stationFilter === "MOBILE" ? "active" : ""}
+            onClick={() => setStationFilter("MOBILE")}
+        >
+            Mobile
+        </button>
+
+        <button
+            className={stationFilter === "DRONE" ? "active" : ""}
+            onClick={() => setStationFilter("DRONE")}
+        >
+            Drone
+        </button>
+    </div>
+
+    <div className="station-list">
+        {filteredStations.length === 0 ? (
+            <p>No stations found for this filter.</p>
+        ) : (
+            filteredStations.map((station) => {
+                const reading = station.readings?.[0];
+                const status = getAQIStatus(reading?.aqi);
+
+                return (
+                    <article className="station-row" key={station.id}>
+                        <div className="station-info">
+                            <h3>{station.name}</h3>
+                            <p>{station.city}, India</p>
+                            <span className="station-type">
+                                {station.type}
+                            </span>
                         </div>
 
-                        <span className="station-count-label">
-                            {stations.length} stations registered
-                        </span>
-                    </div>
+                        <div className="station-aqi-column">
+                            <span className="column-label">AQI</span>
+                            <strong>{reading?.aqi ?? "N/A"}</strong>
+                            <span className={`mini-status ${status.className}`}>
+                                {status.label}
+                            </span>
+                        </div>
 
-                    <div className="station-list">
-                        {stations.map((station) => {
-                            const reading = station.readings?.[0];
-                            const status = getAQIStatus(reading?.aqi);
+                        <div className="station-pollutants">
+                            <span className="column-label">PM2.5</span>
+                            <strong>{reading?.pm25 ?? "N/A"}</strong>
+                            <small>µg/m³</small>
+                        </div>
 
-                            return (
-                                <article className="station-row" key={station.id}>
-                                    <div className="station-identity">
-                                        <div className={`station-marker ${station.type.toLowerCase()}`}>
-                                            {station.type === "FIXED" ? "⌖" :
-                                                station.type === "MOBILE" ? "➤" : "✦"}
-                                        </div>
+                        <div className="station-pollutants">
+                            <span className="column-label">PM10</span>
+                            <strong>{reading?.pm10 ?? "N/A"}</strong>
+                            <small>µg/m³</small>
+                        </div>
 
-                                        <div>
-                                            <h3>{station.name}</h3>
-                                            <p>{station.city}, India</p>
-                                        </div>
-                                    </div>
+                        <div className="station-source">
+                            <span className="column-label">DATA SOURCE</span>
+                            <span className="source-badge">
+                                {reading?.source ?? "N/A"}
+                            </span>
+                        </div>
 
-                                    <div className="station-type-column">
-                                        <span className={`type-badge ${station.type.toLowerCase()}`}>
-                                            {station.type}
-                                        </span>
-                                    </div>
+                        <div className="station-time-column">
+                            <span className="column-label">LAST UPDATED</span>
+                            <span>
+                                {reading?.recordedAt
+                                    ? new Date(reading.recordedAt).toLocaleString()
+                                    : "N/A"}
+                            </span>
+                        </div>
+                    </article>
+                );
+            })
+        )}
+    </div>
+</section>
 
-                                    <div className="station-aqi-column">
-                                        <span className="column-label">AQI</span>
-                                        <strong>{reading?.aqi ?? "N/A"}</strong>
-                                        <span className={`mini-status ${status.className}`}>
-                                            {status.label}
-                                        </span>
-                                    </div>
-
-                                    <div className="station-reading-column">
-                                        <span className="column-label">PM2.5</span>
-                                        <strong>{reading?.pm25 ?? "N/A"}</strong>
-                                        <span className="reading-unit">µg/m³</span>
-                                    </div>
-
-                                    <div className="station-reading-column">
-                                        <span className="column-label">PM10</span>
-                                        <strong>{reading?.pm10 ?? "N/A"}</strong>
-                                        <span className="reading-unit">µg/m³</span>
-                                    </div>
-
-                                    <div className="station-source">
-                                        <span className="column-label">DATA SOURCE</span>
-                                        <span className="source-badge">
-                                            {reading?.source ?? "N/A"}
-                                        </span>
-                                    </div>
-                                    <div className="station-time-column">
-                                        <span className="column-label">LAST UPDATED</span>
-                                        <span>
-                                            {reading?.recordedAt
-                                                ? new Date(reading.recordedAt).toLocaleString()
-                                                : "N/A"}
-                                        </span>
-                                    </div>
-                                </article>
-                            );
-                        })}
-                    </div>
-                </section>
 
                 {/* Footer */}
                 <footer className="dashboard-footer">
