@@ -41,11 +41,13 @@ function App() {
     const [historyLoading, setHistoryLoading] = useState(false);
     const [historyError, setHistoryError] = useState("");
 
+    // Load stations initially
     useEffect(() => {
         const loadStations = async () => {
             try {
                 const data = await fetchStations();
                 setStations(data);
+
                 if (data.length > 0) {
                     setSelectedStationId(String(data[0].id));
                 }
@@ -59,45 +61,80 @@ function App() {
         loadStations();
     }, []);
 
+    // Load historical readings
     useEffect(() => {
-    if (!selectedStationId) return;
+        if (!selectedStationId) return;
 
-    let ignore = false;
+        let ignore = false;
 
-    const loadHistory = async () => {
-        try {
-            setHistoryLoading(true);
-            setHistoryError("");
+        const loadHistory = async () => {
+            try {
+                setHistoryLoading(true);
+                setHistoryError("");
 
-            const data = await fetchStationReadings(
-                selectedStationId
-            );
+                const data = await fetchStationReadings(selectedStationId);
 
-            if (!ignore) {
-                setHistoricalReadings(data);
+                if (!ignore) {
+                    setHistoricalReadings(data);
+                }
+            } catch (err) {
+                if (!ignore) {
+                    setHistoryError(err.message);
+                }
+            } finally {
+                if (!ignore) {
+                    setHistoryLoading(false);
+                }
             }
-        } catch (err) {
-            if (!ignore) {
-                setHistoryError(err.message);
+        };
+
+        loadHistory();
+
+        return () => {
+            ignore = true;
+        };
+    }, [selectedStationId]);
+
+    // Automatically refresh dashboard every 30 seconds
+    useEffect(() => {
+        const refreshDashboard = async () => {
+            try {
+                const updatedStations = await fetchStations();
+                setStations(updatedStations);
+
+                if (selectedStationId) {
+                    const updatedHistory = await fetchStationReadings(
+                        selectedStationId
+                    );
+                    setHistoricalReadings(updatedHistory);
+                }
+            } catch (err) {
+                console.error("Dashboard refresh failed:", err);
             }
-        } finally {
-            if (!ignore) {
-                setHistoryLoading(false);
-            }
+        };
+
+        const intervalId = setInterval(refreshDashboard, 30000);
+
+        return () => clearInterval(intervalId);
+    }, [selectedStationId]);
+
+    // Simulate mobile station movement
+    const handleMoveMobileStation = async () => {
+        const mobileStation = stations.find(
+            (station) => station.type === "MOBILE"
+        );
+
+        if (!mobileStation) {
+            setError("No mobile station found");
+            return;
         }
-    };
 
-    loadHistory();
-
-    return () => {
-        ignore = true;
-    };
-}, [selectedStationId]);
-
-
-useEffect(() => {
-    const refreshDashboard = async () => {
         try {
+            setMoving(true);
+            setMovementError("");
+
+            await simulateStationMovement(mobileStation.id);
+
             const updatedStations = await fetchStations();
             setStations(updatedStations);
 
@@ -108,53 +145,14 @@ useEffect(() => {
                 setHistoricalReadings(updatedHistory);
             }
         } catch (err) {
-            console.error("Dashboard refresh failed:", err);
+            console.error(err);
+            setMovementError(err.message);
+        } finally {
+            setMoving(false);
         }
     };
 
-    const intervalId = setInterval(refreshDashboard, 30000);
-
-    return () => {
-        clearInterval(intervalId);
-    };
-}, [selectedStationId]);
-    
-const handleMoveMobileStation = async () => {
-    // Find the mobile station
-    const mobileStation = stations.find(
-        (station) => station.type === "MOBILE"
-    );
-
-    if (!mobileStation) {
-        setError("No mobile station found");
-        return;
-    }
-
-    try {
-        setMoving(true);
-
-        // Ask backend to generate a new location and reading
-        await simulateStationMovement(mobileStation.id);
-
-        // Fetch updated station data from database
-        const updatedStations = await fetchStations();
-
-        // Update the dashboard
-        setStations(updatedStations);
-
-        if (selectedStationId) {
-            const updatedHistory = await fetchStationReadings(selectedStationId);
-            setHistoricalReadings(updatedHistory);
-        }
-
-    } catch (err) {
-        console.error(err);
-        setMovementError(err.message);
-    } finally {
-        setMoving(false);
-    }
-};
-
+    // Latest readings from all stations
     const readings = stations
         .map((station) => station.readings?.[0])
         .filter(Boolean);
@@ -167,8 +165,10 @@ const handleMoveMobileStation = async () => {
         ? Math.max(...reportedAQIs)
         : null;
 
+    // Status for the main AQI card
     const aqiStatus = getAQIStatus(highestAQI);
 
+    // Station counts
     const fixedCount = stations.filter(
         (station) => station.type === "FIXED"
     ).length;
@@ -181,6 +181,7 @@ const handleMoveMobileStation = async () => {
         (station) => station.type === "DRONE"
     ).length;
 
+    // Highest pollutant reading
     const getPeakPollutant = (key) => {
         const values = readings
             .map((reading) => reading[key])
@@ -197,7 +198,7 @@ const handleMoveMobileStation = async () => {
         { name: "CO", key: "co", unit: "mg/m³", description: "Carbon monoxide" },
         { name: "O₃", key: "o3", unit: "µg/m³", description: "Ozone" },
     ];
-
+    
     if (loading) {
         return (
             <div className="loading-screen">
