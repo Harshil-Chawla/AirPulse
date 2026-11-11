@@ -30,6 +30,24 @@ export const simulateStationMovement = async (stationId) => {
   return data.reading;
 };
 
+export const simulateDroneMovement = async (stationId) => {
+    const response = await fetch(
+        `${API_URL}/stations/${stationId}/simulate-drone-movement`,
+        {
+            method: "POST",
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.message || "Failed to simulate drone movement"
+        );
+    }
+
+    return data.reading;
+};
 
 export const fetchStationReadings = async (stationId) => {
     const response = await fetch(

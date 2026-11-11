@@ -1159,3 +1159,44 @@ button {
         font-size: 11px;
     }
 }
+/* Station Movement Controls */
+.movement-button {
+    padding: 11px 18px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 10px 16px 0;
+}
+
+.mobile-movement-button {
+    background: #2563eb;
+    border-color: #3b82f6;
+}
+
+.mobile-movement-button:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+.drone-movement-button {
+    background: #7c3aed;
+    border-color: #8b5cf6;
+}
+
+.drone-movement-button:hover:not(:disabled) {
+    background: #6d28d9;
+}
+
+.movement-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.movement-error {
+    color: #f87171;
+    font-size: 13px;
+    margin: 0 0 14px;
+}

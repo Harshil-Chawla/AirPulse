@@ -9,10 +9,12 @@ import AQIChart from "./components/AQIChart";
 import AQICategoryLegend from "./components/AQICategoryLegend";
 import StationComparison from "./components/StationComparison";
 
+
 import {
     fetchStations,
     simulateStationMovement,
     fetchStationReadings,
+    simulateDroneMovement,
 } from "./services/stationApi";
 
 
@@ -38,6 +40,7 @@ function App() {
     const [error, setError] = useState("");
     const [movementError, setMovementError] = useState("");
     const [moving, setMoving] = useState(false);
+    const [droneMoving, setDroneMoving] = useState(false);
     const [selectedStationId, setSelectedStationId] = useState("");
     const [historicalReadings, setHistoricalReadings] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
@@ -153,6 +156,40 @@ function App() {
             setMoving(false);
         }
     };
+
+    // Simulate drone station movement
+const handleMoveDroneStation = async () => {
+    const droneStation = stations.find(
+        (station) => station.type === "DRONE"
+    );
+
+    if (!droneStation) {
+        setMovementError("No drone station found");
+        return;
+    }
+
+    try {
+        setDroneMoving(true);
+        setMovementError("");
+
+        await simulateDroneMovement(droneStation.id);
+
+        const updatedStations = await fetchStations();
+        setStations(updatedStations);
+
+        if (selectedStationId) {
+            const updatedHistory = await fetchStationReadings(
+                selectedStationId
+            );
+            setHistoricalReadings(updatedHistory);
+        }
+    } catch (err) {
+        console.error(err);
+        setMovementError(err.message);
+    } finally {
+        setDroneMoving(false);
+    }
+};
 
     // Latest readings from all stations
     const readings = stations
@@ -546,14 +583,24 @@ function App() {
                     </div>
 
                     <button
-                        className="movement-button"
-                        onClick={handleMoveMobileStation}
-                        disabled={moving || mobileCount === 0}
-                    >
-                        {moving
-                            ? "Moving station..."
-                            : "Simulate Mobile Movement"}
-                    </button>
+                      className="movement-button mobile-movement-button"
+                      onClick={handleMoveMobileStation}
+                      disabled={moving || mobileCount === 0}
+                  >
+                      {moving
+                          ? "Moving station..."
+                          : "Simulate Mobile Movement"}
+                  </button>
+
+                  <button
+                      className="movement-button drone-movement-button"
+                      onClick={handleMoveDroneStation}
+                      disabled={droneMoving || droneCount === 0}
+                  >
+                      {droneMoving
+                          ? "Moving drone..."
+                          : "Simulate Drone Movement"}
+                  </button>
 
                     {movementError && (
                         <p className="movement-error">{movementError}</p>
