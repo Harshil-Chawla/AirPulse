@@ -198,7 +198,7 @@ function App() {
         { name: "CO", key: "co", unit: "mg/m³", description: "Carbon monoxide" },
         { name: "O₃", key: "o3", unit: "µg/m³", description: "Ozone" },
     ];
-    
+
     if (loading) {
         return (
             <div className="loading-screen">
@@ -551,6 +551,14 @@ function App() {
                                         <span className="column-label">DATA SOURCE</span>
                                         <span className="source-badge">
                                             {reading?.source ?? "N/A"}
+                                        </span>
+                                    </div>
+                                    <div className="station-time-column">
+                                        <span className="column-label">LAST UPDATED</span>
+                                        <span>
+                                            {reading?.recordedAt
+                                                ? new Date(reading.recordedAt).toLocaleString()
+                                                : "N/A"}
                                         </span>
                                     </div>
                                 </article>
