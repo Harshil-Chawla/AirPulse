@@ -6,6 +6,8 @@ import "./App.css";
 
 import AQIChart from "./components/AQIChart";
 
+import AQICategoryLegend from "./components/AQICategoryLegend";
+
 import {
     fetchStations,
     simulateStationMovement,
@@ -363,6 +365,17 @@ const handleMoveMobileStation = async () => {
                         </div>
                     </div>
                 </section>
+
+                <div className="section-block">
+                    <div className="section-heading">
+                        <div>
+                            <span className="eyebrow">INDIA AQI STANDARD</span>
+                            <h2>Air Quality Categories</h2>
+                        </div>
+                    </div>
+
+                    <AQICategoryLegend />
+                </div>
 
                 {/* Pollutant Cards */}
                 <section className="section-block" id="pollutants">
