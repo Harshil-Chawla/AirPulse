@@ -45,6 +45,7 @@ function App() {
     const [historicalReadings, setHistoricalReadings] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
     const [historyError, setHistoryError] = useState("");
+    const [movementTrails, setMovementTrails] = useState({});
 
     // Load stations initially
     useEffect(() => {
@@ -99,6 +100,54 @@ function App() {
             ignore = true;
         };
     }, [selectedStationId]);
+
+    // Fetch movement history for mobile and drone stations
+    useEffect(() => {
+        const loadMovementTrails = async () => {
+            try {
+                const movingStations = stations.filter(
+                    (station) =>
+                        station.type === "MOBILE" ||
+                        station.type === "DRONE"
+                );
+
+                const results = await Promise.all(
+                    movingStations.map(async (station) => {
+                        const readings = await fetchStationReadings(station.id);
+
+                        return {
+                            stationId: station.id,
+                            trail: readings
+                                .filter(
+                                    (reading) =>
+                                        reading.latitude != null &&
+                                        reading.longitude != null
+                                )
+                                .reverse()
+                                .map((reading) => ({
+                                    latitude: reading.latitude,
+                                    longitude: reading.longitude,
+                                })),
+                        };
+                    })
+                );
+
+                const trails = {};
+
+                results.forEach(({ stationId, trail }) => {
+                    trails[stationId] = trail;
+                });
+
+                setMovementTrails(trails);
+            } catch (err) {
+                console.error("Failed to load movement trails:", err);
+            }
+        };
+
+        if (stations.length > 0) {
+            loadMovementTrails();
+        }
+    }, [stations]);
 
     // Automatically refresh dashboard every 30 seconds
     useEffect(() => {
@@ -608,7 +657,10 @@ const handleMoveDroneStation = async () => {
 
                     <MapLegend />
 
-                    <StationMap stations={stations} />
+                    <StationMap
+                        stations={stations}
+                        movementTrails={movementTrails}
+                    />
                 </section>
 
                 {/* Station Details */}

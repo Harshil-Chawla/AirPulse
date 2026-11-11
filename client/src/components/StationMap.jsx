@@ -4,11 +4,12 @@ import {
     TileLayer,
     CircleMarker,
     Popup,
+    Polyline,
 } from "react-leaflet";
 
 import "leaflet/dist/leaflet.css";
 
-function StationMap({ stations }) {
+function StationMap({ stations, movementTrails }) {
     const firstStation = stations[0];
 
     const center = firstStation
@@ -33,6 +34,34 @@ function StationMap({ stations }) {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+
+                {/* Mobile and drone movement trails */}
+                {stations
+                    .filter(
+                        (station) =>
+                            station.type === "MOBILE" || station.type === "DRONE"
+                    )
+                    .map((station) => {
+                        const trail = movementTrails?.[station.id] || [];
+
+                        if (trail.length < 2) return null;
+
+                        return (
+                            <Polyline
+                                key={`trail-${station.id}`}
+                                positions={trail.map((reading) => [
+                                    reading.latitude,
+                                    reading.longitude,
+                                ])}
+                                pathOptions={{
+                                    color: stationColors[station.type],
+                                    weight: 3,
+                                    opacity: 0.7,
+                                }}
+                            />
+                        );
+                    }
+                )}
 
                 {stations.map((station) => {
                     const reading = station.readings?.[0];
