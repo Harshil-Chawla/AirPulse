@@ -1059,3 +1059,66 @@ button {
     color: white;
     border-color: #2563eb;
 }
+
+.station-details-section {
+    margin: 24px 0;
+    padding: 24px;
+    border-radius: 16px;
+    background: var(--card-bg, #1e293b);
+}
+
+.station-details-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.station-details-header h3 {
+    margin: 0;
+}
+
+.pollutant-details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.pollutant-detail-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px;
+    border-radius: 12px;
+    background: rgba(148, 163, 184, 0.08);
+}
+
+.pollutant-detail-card span {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.pollutant-detail-card strong {
+    font-size: 24px;
+}
+
+.pollutant-detail-card small {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+    .pollutant-details-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+.station-row {
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.station-row.selected {
+    border: 1px solid #3b82f6;
+    background: rgba(59, 130, 246, 0.08);
+}

@@ -226,6 +226,11 @@ function App() {
         : stations.filter(
               (station) => station.type === stationFilter
           );
+    const selectedStation = stations.find(
+    (station) => station.id === selectedStationId
+    );
+
+    const selectedReading = selectedStation?.readings?.[0];
 
     return (
         <div className="app-layout">
@@ -496,6 +501,48 @@ function App() {
     <StationMap stations={stations} />
 </section>
 
+
+<section className="station-details-section">
+    <div className="section-heading">
+        <div>
+            <h2>Station Details</h2>
+            <p>Detailed pollutant readings for the selected station</p>
+        </div>
+    </div>
+
+    {selectedStation && selectedReading ? (
+        <>
+            <div className="station-details-header">
+                <h3>{selectedStation.name}</h3>
+                <span className="station-type">
+                    {selectedStation.type}
+                </span>
+            </div>
+
+            <div className="pollutant-details-grid">
+                {[
+                    { name: "PM2.5", key: "pm25", unit: "µg/m³" },
+                    { name: "PM10", key: "pm10", unit: "µg/m³" },
+                    { name: "NO₂", key: "no2", unit: "µg/m³" },
+                    { name: "SO₂", key: "so2", unit: "µg/m³" },
+                    { name: "CO", key: "co", unit: "mg/m³" },
+                    { name: "O₃", key: "o3", unit: "µg/m³" },
+                ].map((pollutant) => (
+                    <div className="pollutant-detail-card" key={pollutant.key}>
+                        <span>{pollutant.name}</span>
+                        <strong>
+                            {selectedReading[pollutant.key] ?? "N/A"}
+                        </strong>
+                        <small>{pollutant.unit}</small>
+                    </div>
+                ))}
+            </div>
+        </>
+    ) : (
+        <p>No station readings available.</p>
+    )}
+</section>
+
                 {/* Monitoring Stations */}
 
 <section className="monitoring-section">
@@ -545,7 +592,13 @@ function App() {
                 const status = getAQIStatus(reading?.aqi);
 
                 return (
-                    <article className="station-row" key={station.id}>
+                    <article
+                        className={`station-row ${
+                            selectedStationId === station.id ? "selected" : ""
+                        }`}
+                        key={station.id}
+                        onClick={() => setSelectedStationId(station.id)}
+                    >
                         <div className="station-info">
                             <h3>{station.name}</h3>
                             <p>{station.city}, India</p>
