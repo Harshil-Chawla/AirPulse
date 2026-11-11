@@ -1,11 +1,17 @@
 
 import StationMap from "./components/StationMap";
 import { useEffect, useState } from "react";
+
+import "./App.css";
+
+import AQIChart from "./components/AQIChart";
+
 import {
     fetchStations,
     simulateStationMovement,
+    fetchStationReadings,
 } from "./services/stationApi";
-import "./App.css";
+
 
 function getAQIStatus(aqi) {
     if (aqi === null || aqi === undefined) {
@@ -27,12 +33,19 @@ function App() {
     const [error, setError] = useState("");
     const [movementError, setMovementError] = useState("");
     const [moving, setMoving] = useState(false);
+    const [selectedStationId, setSelectedStationId] = useState("");
+    const [historicalReadings, setHistoricalReadings] = useState([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
+    const [historyError, setHistoryError] = useState("");
 
     useEffect(() => {
         const loadStations = async () => {
             try {
                 const data = await fetchStations();
                 setStations(data);
+                if (data.length > 0) {
+                    setSelectedStationId(String(data[0].id));
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -42,6 +55,41 @@ function App() {
 
         loadStations();
     }, []);
+
+    useEffect(() => {
+    if (!selectedStationId) return;
+
+    let ignore = false;
+
+    const loadHistory = async () => {
+        try {
+            setHistoryLoading(true);
+            setHistoryError("");
+
+            const data = await fetchStationReadings(
+                selectedStationId
+            );
+
+            if (!ignore) {
+                setHistoricalReadings(data);
+            }
+        } catch (err) {
+            if (!ignore) {
+                setHistoryError(err.message);
+            }
+        } finally {
+            if (!ignore) {
+                setHistoryLoading(false);
+            }
+        }
+    };
+
+    loadHistory();
+
+    return () => {
+        ignore = true;
+    };
+}, [selectedStationId]);
 
     
 const handleMoveMobileStation = async () => {
@@ -66,6 +114,11 @@ const handleMoveMobileStation = async () => {
 
         // Update the dashboard
         setStations(updatedStations);
+
+        if (selectedStationId) {
+            const updatedHistory = await fetchStationReadings(selectedStationId);
+            setHistoricalReadings(updatedHistory);
+        }
 
     } catch (err) {
         console.error(err);
@@ -322,6 +375,39 @@ const handleMoveMobileStation = async () => {
                     </div>
                 </section>
 
+                        <section className="section-block" id="history">
+    <div className="section-heading">
+        <div>
+            <span className="eyebrow">HISTORICAL ANALYTICS</span>
+            <h2>AQI History</h2>
+        </div>
+        <span className="section-note">Recorded station readings</span>
+    </div>
+
+    <div className="history-controls">
+        <label htmlFor="station-history">Select station</label>
+
+        <select
+            id="station-history"
+            value={selectedStationId}
+            onChange={(e) => setSelectedStationId(e.target.value)}
+        >
+            {stations.map((station) => (
+                <option key={station.id} value={station.id}>
+                    {station.name}
+                </option>
+            ))}
+        </select>
+    </div>
+
+    {historyLoading ? (
+        <p>Loading historical readings...</p>
+    ) : historyError ? (
+        <p className="history-error">{historyError}</p>
+    ) : (
+        <AQIChart readings={historicalReadings} />
+    )}
+</section>
                 {/* Station Map */}
                
 <section className="section-block">

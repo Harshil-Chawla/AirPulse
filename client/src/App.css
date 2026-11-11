@@ -898,3 +898,40 @@ button {
     margin-bottom: 12px;
     font-size: 13px;
 }
+.history-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.history-controls select {
+    background: #17283b;
+    color: #edf4fb;
+    border: 1px solid #34465b;
+    border-radius: 8px;
+    padding: 9px 12px;
+}
+
+.aqi-chart {
+    width: 100%;
+    height: 350px;
+    background: #142235;
+    border: 1px solid #293b50;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.chart-empty {
+    color: #94a3b8;
+    padding: 32px;
+    text-align: center;
+    background: #142235;
+    border-radius: 12px;
+}
+
+.history-error {
+    color: #f87171;
+}

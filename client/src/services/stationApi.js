@@ -29,3 +29,20 @@ export const simulateStationMovement = async (stationId) => {
 
   return data.reading;
 };
+
+
+export const fetchStationReadings = async (stationId) => {
+    const response = await fetch(
+        `${API_URL}/stations/${stationId}/readings`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.message || "Failed to fetch station readings"
+        );
+    }
+
+    return data.readings;
+};
