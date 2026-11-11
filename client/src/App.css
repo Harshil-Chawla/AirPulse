@@ -1200,3 +1200,31 @@ button {
     font-size: 13px;
     margin: 0 0 14px;
 }
+
+/* Fixed vs Mobile Comparison */
+
+.comparison-charts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.comparison-chart {
+    background: #111827;
+    border: 1px solid #263244;
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 0;
+}
+
+.comparison-chart h3 {
+    color: #e5e7eb;
+    font-size: 16px;
+    margin: 0 0 16px;
+}
+
+@media (max-width: 768px) {
+    .comparison-charts {
+        grid-template-columns: 1fr;
+    }
+}

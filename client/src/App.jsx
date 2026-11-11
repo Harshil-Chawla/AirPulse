@@ -269,6 +269,17 @@ const handleMoveDroneStation = async () => {
         (station) => station.type === "DRONE"
     ).length;
 
+    const fixedStation = stations.find(
+    (station) => station.type === "FIXED"
+    );
+
+    const mobileStation = stations.find(
+        (station) => station.type === "MOBILE"
+    );
+
+    const fixedReading = fixedStation?.readings?.[0];
+    const mobileReading = mobileStation?.readings?.[0];
+
     // Highest pollutant reading
     const getPeakPollutant = (key) => {
         const values = readings
