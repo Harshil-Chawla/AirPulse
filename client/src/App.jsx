@@ -12,6 +12,7 @@ import {
     fetchStationReadings,
 } from "./services/stationApi";
 
+import StationComparison from "./components/StationComparison";
 
 function getAQIStatus(aqi) {
     if (aqi === null || aqi === undefined) {
@@ -407,6 +408,20 @@ const handleMoveMobileStation = async () => {
     ) : (
         <AQIChart readings={historicalReadings} />
     )}
+</section>
+
+<section className="section-block" id="comparison">
+    <div className="section-heading">
+        <div>
+            <span className="eyebrow">STATION ANALYTICS</span>
+            <h2>Fixed vs Mobile Comparison</h2>
+        </div>
+        <span className="section-note">
+            Latest AQI readings
+        </span>
+    </div>
+
+    <StationComparison stations={stations} />
 </section>
                 {/* Station Map */}
                
