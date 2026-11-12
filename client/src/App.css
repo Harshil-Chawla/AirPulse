@@ -1228,3 +1228,26 @@ button {
         grid-template-columns: 1fr;
     }
 }
+
+.pollutant-station {
+    color: #9ca3af;
+    font-size: 12px;
+    margin-top: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pollutant-station::before {
+    content: "📍";
+    font-size: 11px;
+}
+
+.pollutant-source {
+    display: inline-block;
+    margin-top: 5px;
+    color: #a1a1aa;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+}

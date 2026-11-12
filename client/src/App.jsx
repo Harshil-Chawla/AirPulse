@@ -281,12 +281,33 @@ const handleMoveDroneStation = async () => {
     const mobileReading = mobileStation?.readings?.[0];
 
     // Highest pollutant reading
+    
     const getPeakPollutant = (key) => {
-        const values = readings
-            .map((reading) => reading[key])
-            .filter((value) => Number.isFinite(value));
+      const peakStation = stations
+        .filter((station) =>
+            Number.isFinite(station.readings?.[0]?.[key])
+        )
+        .reduce((highest, station) => {
+            if (
+                !highest ||
+                station.readings[0][key] >
+                    highest.readings[0][key]
+            ) {
+                return station;
+            }
 
-        return values.length ? Math.max(...values) : null;
+            return highest;
+        }, null);
+
+        
+        if (!peakStation) return null;
+
+        return {
+            value: peakStation.readings[0][key],
+            stationName: peakStation.name,
+            source: peakStation.readings[0].source,
+        };
+
     };
 
     const pollutants = [
@@ -532,37 +553,54 @@ const handleMoveDroneStation = async () => {
                             <span className="eyebrow">AIR COMPOSITION</span>
                             <h2>Pollutant Overview</h2>
                         </div>
+
                         <span className="section-note">
                             Peak reading across stations
                         </span>
                     </div>
 
                     <div className="pollutant-grid">
-                        {pollutants.map((pollutant) => (
-                            <article
-                                className="pollutant-card"
-                                key={pollutant.key}
-                            >
-                                <div className="pollutant-card-top">
-                                    <span className="pollutant-name">
-                                        {pollutant.name}
+                        {pollutants.map((pollutant) => {
+                            const peak = getPeakPollutant(pollutant.key);
+                            const isLoading = loading;
+                            return (
+                                <article
+                                    className="pollutant-card"
+                                    key={pollutant.key}
+                                >
+                                    <div className="pollutant-card-top">
+                                        <span className="pollutant-name">
+                                            {pollutant.name}
+                                        </span>
+
+                                        <span className="pollutant-symbol">◈</span>
+                                    </div>
+
+                                    <div className="pollutant-value">
+                                        {isLoading ? "..." : peak?.value ?? "N/A"}
+                                    </div>
+
+                                    <span className="pollutant-unit">
+                                        {pollutant.unit}
                                     </span>
-                                    <span className="pollutant-symbol">◈</span>
-                                </div>
 
-                                <div className="pollutant-value">
-                                    {getPeakPollutant(pollutant.key) ?? "N/A"}
-                                </div>
+                                    <p className="pollutant-station">
+                                        {isLoading
+                                            ? "Loading station..."
+                                            : peak?.stationName ?? "No station data"}
+                                    </p>
 
-                                <span className="pollutant-unit">
-                                    {pollutant.unit}
-                                </span>
+                                    <span className="pollutant-source">
+                                        Source: {peak?.source ?? "Unknown"}
+                                    </span>
 
-                                <p>{pollutant.description}</p>
-                            </article>
-                        ))}
+                                    <p>{pollutant.description}</p>
+                                </article>
+                            );
+                        })}
                     </div>
                 </section>
+
 
                 {/* AQI History */}
                 <section className="section-block" id="history">
