@@ -30,7 +30,7 @@ export const getStationReadings = async (stationId) => {
 };
 
 
-export const simulateMobileMovement = async (stationId) => {
+export const simulateMobileMovement = async (stationId, stationType = "MOBILE") => {
   // Find the station and its latest reading
   const station = await prisma.station.findUnique({
     where: { id: stationId },
@@ -46,8 +46,8 @@ export const simulateMobileMovement = async (stationId) => {
     throw new Error("Station not found");
   }
 
-  if (station.type !== "MOBILE") {
-    throw new Error("Only mobile stations can move");
+  if (station.type !== stationType) {
+    throw new Error("Station type does not match this simulation");
   }
 
   const latestReading = station.readings[0];
