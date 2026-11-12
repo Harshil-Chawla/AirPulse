@@ -1,66 +1,19 @@
+const API_URL = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 
-const API_URL = "http://localhost:3000/api";
-
-export const fetchStations = async () => {
-    const response = await fetch(`${API_URL}/stations`);
-
+async function request(path, options) {
+    const response = await fetch(`${API_URL}${path}`, options);
+    const data = await response.json().catch(() => null);
     if (!response.ok) {
-        throw new Error("Failed to fetch stations");
+        throw new Error(data?.message || `Request failed (${response.status})`);
     }
+    if (!data?.success) throw new Error("Unexpected server response");
+    return data;
+}
 
-    const data = await response.json();
-
-    return data.stations;
-};
-
-export const simulateStationMovement = async (stationId) => {
-  const response = await fetch(
-    `${API_URL}/stations/${stationId}/simulate-movement`,
-    {
-      method: "POST",
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to simulate movement");
-  }
-
-  return data.reading;
-};
-
-export const simulateDroneMovement = async (stationId) => {
-    const response = await fetch(
-        `${API_URL}/stations/${stationId}/simulate-drone-movement`,
-        {
-            method: "POST",
-        }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(
-            data.message || "Failed to simulate drone movement"
-        );
-    }
-
-    return data.reading;
-};
-
-export const fetchStationReadings = async (stationId) => {
-    const response = await fetch(
-        `${API_URL}/stations/${stationId}/readings`
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(
-            data.message || "Failed to fetch station readings"
-        );
-    }
-
-    return data.readings;
-};
+export const fetchStations = async () => (await request("/stations")).stations;
+export const fetchStationReadings = async (id, signal) =>
+    (await request(`/stations/${id}/readings?limit=200`, { signal })).readings;
+export const simulateStationMovement = async (id) =>
+    (await request(`/stations/${id}/simulate-movement`, { method: "POST" })).reading;
+export const simulateDroneMovement = async (id) =>
+    (await request(`/stations/${id}/simulate-drone-movement`, { method: "POST" })).reading;

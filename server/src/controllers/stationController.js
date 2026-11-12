@@ -66,7 +66,9 @@ export const moveMobileStation = async (req, res) => {
       });
     }
 
-    const reading = await simulateMobileMovement(stationId);
+    const reading = await simulateMobileMovement(
+      stationId, req.path.endsWith("simulate-drone-movement") ? "DRONE" : "MOBILE"
+    );
 
     return res.status(201).json({
       success: true,
