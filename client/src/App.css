@@ -2077,6 +2077,256 @@ button {
     border-radius: 4px;
 }
 
+/* ==========================================================================
+   SPATIOTEMPORAL ANOMALY DETECTION
+   ========================================================================== */
+
+.anomaly-summary-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.anomaly-stat-card {
+    background: #111a28;
+    border: 1px solid #1e2c3e;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.anomaly-stat-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+.anomaly-stat-num {
+    font-family: 'Outfit', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #f1f5f9;
+}
+
+.anomaly-stat-num.text-warn {
+    color: #f97316;
+}
+
+.anomaly-stat-num.text-ok {
+    color: #34d399;
+}
+
+.anomaly-stat-sub {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.anomaly-stat-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 6px;
+    width: fit-content;
+}
+
+.badge-critical {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.badge-nominal {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.anomaly-clean-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(90deg, rgba(52, 211, 153, 0.08), rgba(16, 185, 129, 0.04));
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    color: #a7f3d0;
+    font-size: 13px;
+    padding: 16px 20px;
+    border-radius: 10px;
+}
+
+.anomaly-clean-banner span {
+    font-size: 16px;
+    font-weight: 800;
+    color: #34d399;
+}
+
+.anomaly-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 18px;
+}
+
+.anomaly-card {
+    background: linear-gradient(145deg, #131d2b, #0e1622);
+    border: 1px solid #1f2f42;
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.anomaly-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+    border-color: #2b4059;
+}
+
+.anomaly-card.severity-card-critical { border-left: 4px solid #a855f7; }
+.anomaly-card.severity-card-high { border-left: 4px solid #ef4444; }
+.anomaly-card.severity-card-medium { border-left: 4px solid #f97316; }
+.anomaly-card.severity-card-low { border-left: 4px solid #eab308; }
+
+.anomaly-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.anomaly-type-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.anomaly-type-pill {
+    background: #1e293b;
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
+.anomaly-severity-pill {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
+.anomaly-severity-pill.severity-critical { background: rgba(168, 85, 247, 0.25); color: #c084fc; }
+.anomaly-severity-pill.severity-high { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.anomaly-severity-pill.severity-medium { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+.anomaly-severity-pill.severity-low { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+
+.anomaly-station-tag {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.anomaly-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.anomaly-station-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin: 0;
+}
+
+.anomaly-coords {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.anomaly-diagnosis {
+    font-size: 13px;
+    color: #cbd5e1;
+    line-height: 1.45;
+    margin: 0;
+    background: #0a111b;
+    border: 1px solid #162335;
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+.anomaly-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 8px;
+}
+
+.anomaly-metric-box {
+    background: #111a28;
+    border: 1px solid #1d2a3d;
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 3px;
+}
+
+.box-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.box-val {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: #f1f5f9;
+}
+
+.box-val.text-delta {
+    color: #f97316;
+}
+
+.anomaly-inspect-btn {
+    background: #152233;
+    border: 1px solid #233750;
+    color: #93c5fd;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-self: flex-start;
+    margin-top: 4px;
+}
+
+.anomaly-inspect-btn:hover {
+    background: #1f334d;
+    border-color: #3b82f6;
+    color: #bfdbfe;
+}
+
+
 
 
 

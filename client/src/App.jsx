@@ -11,6 +11,7 @@ import AQIChart from "./components/AQIChart";
 import AQICategoryLegend from "./components/AQICategoryLegend";
 import StationComparison from "./components/StationComparison";
 import HotspotPanel from "./components/HotspotPanel";
+import AnomalyAlerts from "./components/AnomalyAlerts";
 import CoverageIntelligence from "./components/CoverageIntelligence";
 import DeploymentRecommendations from "./components/DeploymentRecommendations";
 import { getDominantPollutant } from "./utils/hotspotDetection";
@@ -463,6 +464,10 @@ function App() {
                         <span>🔥</span> Hotspots
                     </a>
 
+                    <a href="#anomalies" className="nav-link">
+                        <span>⚡</span> Anomaly Detection
+                    </a>
+
                     <a href="#coverage" className="nav-link">
                         <span>🌐</span> Coverage Gaps
                     </a>
@@ -642,6 +647,9 @@ function App() {
 
                 {/* Pollution Hotspot Detection */}
                 <HotspotPanel stations={stations} />
+
+                {/* Spatiotemporal AQI Anomaly Detection */}
+                <AnomalyAlerts stations={stations} onSelectStation={selectStation} />
 
                 {/* Pollutant Cards */}
                 <section className="section-block" id="pollutants">
