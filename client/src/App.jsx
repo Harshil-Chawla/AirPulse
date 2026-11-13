@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import "./App.css";
 
+import { downloadReadings } from "./utils/exportReadings";
 import AreaSummary from "./components/AreaSummary";
 import StationMap from "./components/StationMap";
 import MapLegend from "./components/MapLegend";
@@ -700,6 +701,8 @@ function App() {
                         </select>
                     </div>
 
+                    <button className="movement-button" disabled={historyLoading || !!historyError || !historicalReadings.length}
+                        onClick={() => downloadReadings(historicalReadings, selectedStationId)}>Export displayed history (up to 200 readings)</button>
                     {historyLoading ? (
                         <p>Loading historical readings...</p>
                     ) : historyError ? (
