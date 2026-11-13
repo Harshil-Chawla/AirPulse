@@ -22,15 +22,16 @@ import {
 
 
 function getAQIStatus(aqi) {
-    if (aqi === null || aqi === undefined) {
+    if (aqi === null || aqi === undefined || !Number.isFinite(Number(aqi)) || Number(aqi) < 0) {
         return { label: "Unavailable", className: "unavailable" };
     }
 
-    if (aqi <= 50) return { label: "Good", className: "good" };
-    if (aqi <= 100) return { label: "Satisfactory", className: "satisfactory" };
-    if (aqi <= 200) return { label: "Moderate", className: "moderate" };
-    if (aqi <= 300) return { label: "Poor", className: "poor" };
-    if (aqi <= 400) return { label: "Very Poor", className: "very-poor" };
+    const val = Number(aqi);
+    if (val <= 50) return { label: "Good", className: "good" };
+    if (val <= 100) return { label: "Satisfactory", className: "satisfactory" };
+    if (val <= 200) return { label: "Moderate", className: "moderate" };
+    if (val <= 300) return { label: "Poor", className: "poor" };
+    if (val <= 400) return { label: "Very Poor", className: "very-poor" };
 
     return { label: "Severe", className: "severe" };
 }
@@ -292,7 +293,7 @@ function App() {
 
     const reportedAQIs = readings
         .map((reading) => reading.aqi)
-        .filter((aqi) => Number.isFinite(aqi));
+        .filter((aqi) => Number.isFinite(aqi) && aqi >= 0 && aqi <= 500);
 
     const highestAQI = reportedAQIs.length
         ? Math.max(...reportedAQIs)
@@ -318,9 +319,10 @@ function App() {
     
     const getPeakPollutant = (key) => {
       const peakStation = stations
-        .filter((station) =>
-            Number.isFinite(station.readings?.[0]?.[key])
-        )
+        .filter((station) => {
+            const val = station.readings?.[0]?.[key];
+            return Number.isFinite(val) && val >= 0;
+        })
         .reduce((highest, station) => {
             if (
                 !highest ||
