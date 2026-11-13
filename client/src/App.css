@@ -1251,3 +1251,16 @@ button {
     font-size: 11px;
     letter-spacing: 0.3px;
 }
+.last-updated {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.last-updated strong {
+    color: #e5e7eb;
+    font-size: 12px;
+    font-weight: 500;
+}

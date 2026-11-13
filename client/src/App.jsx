@@ -46,6 +46,7 @@ function App() {
     const [historyLoading, setHistoryLoading] = useState(false);
     const [historyError, setHistoryError] = useState("");
     const [movementTrails, setMovementTrails] = useState({});
+    const [lastUpdated, setLastUpdated] = useState(null);
 
     // Load stations initially
     useEffect(() => {
@@ -53,6 +54,7 @@ function App() {
             try {
                 const data = await fetchStations();
                 setStations(data);
+                setLastUpdated(new Date());
 
                 if (data.length > 0) {
                     setSelectedStationId(String(data[0].id));
@@ -150,27 +152,33 @@ function App() {
     }, [stations]);
 
     // Automatically refresh dashboard every 30 seconds
-    useEffect(() => {
-        const refreshDashboard = async () => {
-            try {
-                const updatedStations = await fetchStations();
-                setStations(updatedStations);
 
-                if (selectedStationId) {
-                    const updatedHistory = await fetchStationReadings(
-                        selectedStationId
-                    );
-                    setHistoricalReadings(updatedHistory);
-                }
-            } catch (err) {
-                console.error("Dashboard refresh failed:", err);
+useEffect(() => {
+    const refreshDashboard = async () => {
+        try {
+            const updatedStations = await fetchStations();
+            setStations(updatedStations);
+
+            if (selectedStationId) {
+                const updatedHistory = await fetchStationReadings(
+                    selectedStationId
+                );
+                setHistoricalReadings(updatedHistory);
             }
-        };
 
-        const intervalId = setInterval(refreshDashboard, 30000);
+            // Update timestamp after successful refresh
+            setLastUpdated(new Date());
 
-        return () => clearInterval(intervalId);
-    }, [selectedStationId]);
+        } catch (err) {
+            console.error("Dashboard refresh failed:", err);
+        }
+    };
+
+    const intervalId = setInterval(refreshDashboard, 30000);
+
+    return () => clearInterval(intervalId);
+}, [selectedStationId]);
+
 
     // Simulate mobile station movement
     const handleMoveMobileStation = async () => {
@@ -440,16 +448,25 @@ const handleMoveDroneStation = async () => {
                         </p>
                     </div>
 
-                    <div className="topbar-right">
-                        <span className="live-indicator">
-                            <span className="status-dot"></span>
-                            LIVE MONITORING
-                        </span>
+                  <div className="topbar-right">
+                      <span className="live-indicator">
+                          <span className="status-dot"></span>
+                          LIVE MONITORING
+                      </span>
 
-                        <div className="location-tag">
-                            <span>⌖</span> Delhi, India
-                        </div>
-                    </div>
+                      <div className="last-updated">
+                          <span>Last updated</span>
+                          <strong>
+                              {lastUpdated
+                                  ? lastUpdated.toLocaleTimeString()
+                                  : "Waiting for data..."}
+                          </strong>
+                      </div>
+
+                      <div className="location-tag">
+                          <span>⌖</span> Delhi, India
+                      </div>
+                  </div>
                 </header>
 
                 {/* AQI Overview */}
