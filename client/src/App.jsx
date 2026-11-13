@@ -14,6 +14,7 @@ import HotspotPanel from "./components/HotspotPanel";
 import AnomalyAlerts from "./components/AnomalyAlerts";
 import CoverageIntelligence from "./components/CoverageIntelligence";
 import DeploymentRecommendations from "./components/DeploymentRecommendations";
+import AdaptiveOptimizationPanel from "./components/AdaptiveOptimizationPanel";
 import { getDominantPollutant } from "./utils/hotspotDetection";
 
 
@@ -476,6 +477,10 @@ function App() {
                         <span>🎯</span> Smart Dispatch
                     </a>
 
+                    <a href="#optimization" className="nav-link">
+                        <span>🧭</span> Adaptive Optimization
+                    </a>
+
                     <a href="#stations" className="nav-link">
                         <span>⌖</span> Monitoring Stations
                     </a>
@@ -766,6 +771,16 @@ function App() {
 
                 {/* Smart Mobile & Drone Deployment Recommendations */}
                 <DeploymentRecommendations stations={stations} onSelectStation={selectStation} />
+
+                {/* Adaptive Mobile Monitoring Optimization Engine */}
+                <AdaptiveOptimizationPanel
+                    stations={stations}
+                    onSelectStation={selectStation}
+                    onMoveMobile={handleMoveMobileStation}
+                    onMoveDrone={handleMoveDroneStation}
+                    moving={moving}
+                    droneMoving={droneMoving}
+                />
                 {/* Fixed vs Mobile Comparison */}
                 <section className="section-block" id="comparison">
                     <div className="section-heading">
