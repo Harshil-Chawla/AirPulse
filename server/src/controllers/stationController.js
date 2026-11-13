@@ -1,119 +1,33 @@
+import { stationId, historyOptions } from "../lib/validation.js";
+import { getAllStations, getStationReadings, simulateMobileMovement, simulateDroneMovement } from "../services/stationService.js";
 
-import { historyOptions } from "../lib/validation.js";
-import {
-    getAllStations,
-    getStationReadings,
-    simulateMobileMovement,
-    simulateDroneMovement
-} from "../services/stationService.js";
-
-
+const failure = (res, error) => {
+    const status = error.message === "Station not found" ? 404 : error.message === "Station type does not match this simulation" ? 400 : 500;
+    if (status === 500) console.error(error);
+    return res.status(status).json({ success: false, message: status === 500 ? "Unable to complete request" : error.message });
+};
+function parseId(req, res) {
+    try { return stationId(req.params.id); }
+    catch (error) { res.status(400).json({ success: false, message: error.message }); return null; }
+}
 export const fetchStations = async (req, res) => {
-    try {
-        const stations = await getAllStations();
-
-        res.status(200).json({
-            success: true,
-            count: stations.length,
-            stations,
-        });
-    } catch (error) {
-        console.error("Error fetching stations:", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Failed to fetch stations",
-        });
-    }
+    try { const stations = await getAllStations(); res.json({ success: true, count: stations.length, stations }); }
+    catch (error) { failure(res, error); }
 };
-
-
 export const fetchStationReadings = async (req, res) => {
-    try {
-        const stationId = Number(req.params.id);
-
-        // Validate the station ID
-        if (!Number.isInteger(stationId) || stationId <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid station ID",
-            });
-        }
-
-        let options;
-        try { options = historyOptions(req.query); }
-        catch (error) { return res.status(400).json({ success: false, message: error.message }); }
-        const readings = await getStationReadings(stationId, options);
-
-        res.status(200).json({
-            success: true,
-            count: readings.length,
-            readings,
-        });
-    } catch (error) {
-        console.error("Error fetching station readings:", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Failed to fetch station readings",
-        });
-    }
+    const id = parseId(req, res);
+    if (id === null) return;
+    let options;
+    try { options = historyOptions(req.query); }
+    catch (error) { return res.status(400).json({ success: false, message: error.message }); }
+    try { const readings = await getStationReadings(id, options); res.json({ success: true, count: readings.length, readings }); }
+    catch (error) { failure(res, error); }
 };
-
-export const moveMobileStation = async (req, res) => {
-  try {
-    const stationId = Number(req.params.id);
-
-    if (!Number.isInteger(stationId) || stationId <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid station ID",
-      });
-    }
-
-    const reading = await simulateMobileMovement(
-      stationId, req.path.endsWith("simulate-drone-movement") ? "DRONE" : "MOBILE"
-    );
-
-    return res.status(201).json({
-      success: true,
-      message: "Simulated movement recorded",
-      reading,
-    });
-  } catch (error) {
-    const status = error.message === "Station not found" ? 404 : 400;
-
-    return res.status(status).json({
-      success: false,
-      message: error.message,
-    });
-  }
+const move = (service) => async (req, res) => {
+    const id = parseId(req, res);
+    if (id === null) return;
+    try { const reading = await service(id); res.status(201).json({ success: true, reading }); }
+    catch (error) { failure(res, error); }
 };
-
-export const moveDroneStation = async (req, res) => {
-    try {
-        const stationId = Number(req.params.id);
-
-        if (!Number.isInteger(stationId) || stationId <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid station ID",
-            });
-        }
-
-        const reading = await simulateDroneMovement(stationId);
-
-        return res.status(201).json({
-            success: true,
-            message: "Simulated drone movement recorded",
-            reading,
-        });
-    } catch (error) {
-        const status = error.message === "Station not found" ? 404 : 400;
-
-        return res.status(status).json({
-            success: false,
-            message: error.message,
-        });
-    }
-};
+export const moveMobileStation = move(simulateMobileMovement);
+export const moveDroneStation = move(simulateDroneMovement);

@@ -17,6 +17,7 @@ export const getAllStations = async () => {
 };
 
 export const getStationReadings = async (stationId, { limit = 200, since } = {}) => {
+    if (!await prisma.station.findUnique({ where: { id: stationId } })) throw new Error("Station not found");
     const readings = await prisma.reading.findMany({
         take: limit,
         where: {

@@ -38,4 +38,11 @@ app.get("/api/db-health", async (req, res) => {
     }
 });
 
+app.use((req, res) => res.status(404).json({ success: false, message: "Route not found" }));
+app.use((error, req, res, next) => {
+    if (res.headersSent) return next(error);
+    const invalid = error.type === "entity.parse.failed";
+    if (!invalid) console.error(error);
+    res.status(invalid ? 400 : 500).json({ success: false, message: invalid ? "Invalid JSON" : "Server error" });
+});
 export default app;
