@@ -1812,5 +1812,194 @@ button {
     color: #f59e0b;
 }
 
+/* ==========================================================================
+   SMART DEPLOYMENT RECOMMENDATIONS
+   ========================================================================== */
+
+.recommendations-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: linear-gradient(90deg, rgba(56, 189, 248, 0.08), rgba(99, 102, 241, 0.05));
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 22px;
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.5;
+}
+
+.recommendations-info-icon {
+    font-size: 16px;
+    margin-top: 1px;
+}
+
+.recommendations-banner p {
+    margin: 0;
+}
+
+.recommendations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 18px;
+}
+
+.rec-card {
+    background: linear-gradient(145deg, #121c2c, #0d1624);
+    border: 1px solid #1e2c3e;
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.rec-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+    border-color: #2c425e;
+}
+
+.rec-card.priority-border-critical {
+    border-left: 4px solid #a855f7;
+}
+
+.rec-card.priority-border-high {
+    border-left: 4px solid #ef4444;
+}
+
+.rec-card.priority-border-medium {
+    border-left: 4px solid #f59e0b;
+}
+
+.rec-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.rec-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rec-unit-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.rec-unit-badge.drone-badge {
+    background: rgba(168, 85, 247, 0.16);
+    color: #d8b4fe;
+    border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.rec-unit-badge.mobile-badge {
+    background: rgba(56, 189, 248, 0.16);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.rec-priority-badge {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
+.rec-priority-critical {
+    background: rgba(168, 85, 247, 0.25);
+    color: #c084fc;
+}
+
+.rec-priority-high {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.rec-priority-medium {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.rec-coords {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.rec-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin: 2px 0 0;
+}
+
+.rec-target-zone {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.rec-target-zone strong {
+    color: #e2e8f0;
+}
+
+.rec-content-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rec-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+.rec-text {
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.45;
+    margin: 0;
+}
+
+.rec-text.impact-text {
+    color: #7dd3fc;
+    font-size: 12px;
+}
+
+.rec-action-button {
+    margin-top: 6px;
+    background: #142234;
+    border: 1px solid #233752;
+    color: #93c5fd;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-self: flex-start;
+}
+
+.rec-action-button:hover {
+    background: #1e334d;
+    border-color: #3b82f6;
+    color: #bfdbfe;
+}
+
+
 
 

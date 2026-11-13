@@ -12,6 +12,7 @@ import AQICategoryLegend from "./components/AQICategoryLegend";
 import StationComparison from "./components/StationComparison";
 import HotspotPanel from "./components/HotspotPanel";
 import CoverageIntelligence from "./components/CoverageIntelligence";
+import DeploymentRecommendations from "./components/DeploymentRecommendations";
 
 
 import {
@@ -465,6 +466,10 @@ function App() {
                         <span>🌐</span> Coverage Gaps
                     </a>
 
+                    <a href="#recommendations" className="nav-link">
+                        <span>🎯</span> Smart Dispatch
+                    </a>
+
                     <a href="#stations" className="nav-link">
                         <span>⌖</span> Monitoring Stations
                     </a>
@@ -749,6 +754,9 @@ function App() {
 
                 {/* Coverage Intelligence & Gaps */}
                 <CoverageIntelligence stations={stations} />
+
+                {/* Smart Mobile & Drone Deployment Recommendations */}
+                <DeploymentRecommendations stations={stations} onSelectStation={selectStation} />
                 {/* Fixed vs Mobile Comparison */}
                 <section className="section-block" id="comparison">
                     <div className="section-heading">
