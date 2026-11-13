@@ -1,11 +1,11 @@
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 
 import "./App.css";
 
 import { downloadReadings } from "./utils/exportReadings";
 import AreaSummary from "./components/AreaSummary";
-import StationMap from "./components/StationMap";
+const StationMap = lazy(() => import("./components/StationMap"));
 
 import AQIChart from "./components/AQIChart";
 import AQICategoryLegend from "./components/AQICategoryLegend";
@@ -760,10 +760,12 @@ function App() {
 
 
 
+                    <Suspense fallback={<p>Loading map...</p>}>
                     <StationMap
                         stations={stations}
                         movementTrails={movementTrails}
                     />
+                    </Suspense>
                 </section>
 
                 {/* Station Details */}
