@@ -1285,3 +1285,171 @@ button {
     cursor: not-allowed;
 }
 .station-row:focus-visible { outline: 3px solid #5eead4; outline-offset: 3px; }
+
+/* ==========================================================================
+   DASHBOARD UPGRADE & RESPONSIVE POLISH
+   ========================================================================== */
+
+/* Compact Demo Banner & Alerts */
+.demo-banner-compact {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(90deg, rgba(20, 184, 166, 0.14), rgba(15, 118, 110, 0.08));
+    border: 1px solid rgba(45, 212, 191, 0.32);
+    border-radius: 10px;
+    padding: 8px 16px;
+    margin-bottom: 22px;
+    font-size: 12px;
+    color: #cbd5e1;
+    backdrop-filter: blur(8px);
+    max-width: 100%;
+}
+
+.demo-badge {
+    background: #0f766e;
+    color: #5eead4;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.demo-text {
+    line-height: 1.4;
+}
+
+.dashboard-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 18px;
+}
+
+.warning-alert {
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #fbbf24;
+}
+
+/* History Toolbar */
+.history-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+    background: #111a28;
+    border: 1px solid #1f2d40;
+    border-radius: 12px;
+    padding: 16px 20px;
+}
+
+.history-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.history-selector label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    color: #94a3b8;
+    text-transform: uppercase;
+}
+
+.history-selector select {
+    background: #172436;
+    border: 1px solid #2b3d54;
+    border-radius: 8px;
+    color: #f1f5f9;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    min-width: 220px;
+    transition: border-color 0.2s;
+}
+
+.history-selector select:focus {
+    border-color: #5eead4;
+}
+
+.history-export-btn {
+    background: #0f2b3c;
+    border: 1px solid #1e4963;
+    color: #38bdf8;
+    margin: 0;
+}
+
+.history-export-btn:hover:not(:disabled) {
+    background: #153e56;
+    border-color: #38bdf8;
+    color: #7dd3fc;
+}
+
+/* Visual Polish for Dashboard Cards */
+.aqi-panel,
+.station-summary-panel,
+.pollutant-card,
+.comparison-chart {
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.aqi-panel:hover,
+.station-summary-panel:hover,
+.comparison-chart:hover {
+    border-color: #334b6b;
+    box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
+}
+
+.pollutant-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(94, 234, 212, 0.35);
+    box-shadow: 0 6px 20px -4px rgba(94, 234, 212, 0.12);
+}
+
+/* Responsive Polish */
+@media (max-width: 960px) {
+    .app-layout {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+        border-right: none;
+        border-bottom: 1px solid #253247;
+        padding: 16px 20px;
+    }
+    .sidebar .brand {
+        padding: 0 0 12px;
+    }
+    .sidebar .navigation {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .sidebar .nav-link {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+    .main-content {
+        padding: 24px 18px;
+    }
+    .hero-grid {
+        grid-template-columns: 1fr;
+    }
+    .pollutant-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+

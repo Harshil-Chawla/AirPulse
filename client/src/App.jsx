@@ -519,8 +519,17 @@ function App() {
                   </div>
                 </header>
 
-                {refreshError && <p role="status">{refreshError}</p>}
-                {demoMode && <p role="status">Demo preview: sample data stored only in this browser session. Reloading resets it.</p>}
+                {refreshError && (
+                    <div className="dashboard-alert warning-alert" role="status">
+                        <span>⚠</span> {refreshError}
+                    </div>
+                )}
+                {demoMode && (
+                    <div className="demo-banner-compact" role="status">
+                        <span className="demo-badge">Demo Mode</span>
+                        <span className="demo-text">Demo preview: sample data stored only in this browser session. Reloading resets it.</span>
+                    </div>
+                )}
                 {/* AQI Overview */}
                 <section className="hero-grid" id="overview">
 
@@ -685,31 +694,35 @@ function App() {
                         </span>
                     </div>
 
-                    <div className="history-controls">
-                        <label htmlFor="station-history">
-                            Select station
-                        </label>
+                    <div className="history-toolbar">
+                        <div className="history-selector">
+                            <label htmlFor="station-history">
+                                Select station
+                            </label>
 
-                        <select
-                            id="station-history"
-                            value={selectedStationId}
-                            onChange={(e) =>
-                                selectStation(e.target.value)
-                            }
-                        >
-                            {stations.map((station) => (
-                                <option
-                                    key={station.id}
-                                    value={station.id}
-                                >
-                                    {station.name}
-                                </option>
-                            ))}
-                        </select>
+                            <select
+                                id="station-history"
+                                value={selectedStationId}
+                                onChange={(e) =>
+                                    selectStation(e.target.value)
+                                }
+                            >
+                                {stations.map((station) => (
+                                    <option
+                                        key={station.id}
+                                        value={station.id}
+                                    >
+                                        {station.name} ({station.type})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <button className="movement-button history-export-btn" disabled={historyLoading || !!historyError || !historicalReadings.length}
+                            onClick={() => downloadReadings(historicalReadings, selectedStationId)}>
+                            <span>↓</span> Export displayed history (up to 200 readings)
+                        </button>
                     </div>
-
-                    <button className="movement-button" disabled={historyLoading || !!historyError || !historicalReadings.length}
-                        onClick={() => downloadReadings(historicalReadings, selectedStationId)}>Export displayed history (up to 200 readings)</button>
                     {historyLoading ? (
                         <p>Loading historical readings...</p>
                     ) : historyError ? (
