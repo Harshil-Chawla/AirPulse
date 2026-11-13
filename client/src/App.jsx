@@ -13,6 +13,7 @@ import StationComparison from "./components/StationComparison";
 
 
 import {
+    demoMode,
     fetchStations,
     simulateStationMovement,
     fetchStationReadings,
@@ -452,7 +453,7 @@ function App() {
                         <span className="status-dot"></span>
                         <div>
                             <strong>{refreshError ? "Refresh interrupted" : "Data loaded"}</strong>
-                            <p>Backend connected</p>
+                            <p>{demoMode ? "Local demo data" : "Station data loaded"}</p>
                         </div>
                     </div>
 
@@ -476,7 +477,7 @@ function App() {
                   <div className="topbar-right">
                       <span className="live-indicator">
                           <span className="status-dot"></span>
-                          LIVE MONITORING
+                          {demoMode ? "DEMO PREVIEW" : "STATION MONITORING"}
                       </span>
 
                       <button
@@ -503,6 +504,7 @@ function App() {
                 </header>
 
                 {refreshError && <p role="status">{refreshError}</p>}
+                {demoMode && <p role="status">Demo preview: sample data stored only in this browser session. Reloading resets it.</p>}
                 {/* AQI Overview */}
                 <section className="hero-grid" id="overview">
 

@@ -1,3 +1,6 @@
+import { createDemoStore } from "./demoData";
+export const demoMode = import.meta.env.VITE_DEMO_MODE === "true";
+const demo = demoMode ? createDemoStore() : null;
 const API_URL = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 
 async function request(path, options) {
@@ -13,10 +16,10 @@ async function request(path, options) {
     return data;
 }
 
-export const fetchStations = async () => (await request("/stations")).stations;
+export const fetchStations = async () => demo ? demo.stations() : (await request("/stations")).stations;
 export const fetchStationReadings = async (id, signal) =>
-    (await request(`/stations/${id}/readings?limit=200`, { signal })).readings;
+    demo ? demo.readings(id) : (await request(`/stations/${id}/readings?limit=200`, { signal })).readings;
 export const simulateStationMovement = async (id) =>
-    (await request(`/stations/${id}/simulate-movement`, { method: "POST" })).reading;
+    demo ? demo.move(id, "MOBILE") : (await request(`/stations/${id}/simulate-movement`, { method: "POST" })).reading;
 export const simulateDroneMovement = async (id) =>
-    (await request(`/stations/${id}/simulate-drone-movement`, { method: "POST" })).reading;
+    demo ? demo.move(id, "DRONE") : (await request(`/stations/${id}/simulate-drone-movement`, { method: "POST" })).reading;
