@@ -196,9 +196,7 @@ function App() {
 
     // Simulate mobile station movement
     const handleMoveMobileStation = async () => {
-        const mobileStation = stations.find(
-            (station) => station.type === "MOBILE"
-        );
+        const mobileStation = stations.find(station => String(station.id) === selectedStationId && station.type === "MOBILE");
 
         if (!mobileStation) {
             setMovementError("No mobile station found");
@@ -254,9 +252,7 @@ function App() {
 
     // Simulate drone station movement
     const handleMoveDroneStation = async () => {
-        const droneStation = stations.find(
-            (station) => station.type === "DRONE"
-        );
+        const droneStation = stations.find(station => String(station.id) === selectedStationId && station.type === "DRONE");
 
         if (!droneStation) {
             setMovementError("No drone station found");
@@ -747,21 +743,21 @@ function App() {
                     <button
                       className="movement-button mobile-movement-button"
                       onClick={handleMoveMobileStation}
-                      disabled={moving || mobileCount === 0}
+                      disabled={moving || selectedStation?.type !== "MOBILE"}
                   >
                       {moving
                           ? "Moving station..."
-                          : "Simulate Mobile Movement"}
+                          : "Move selected mobile station"}
                   </button>
 
                   <button
                       className="movement-button drone-movement-button"
                       onClick={handleMoveDroneStation}
-                      disabled={droneMoving || droneCount === 0}
+                      disabled={droneMoving || selectedStation?.type !== "DRONE"}
                   >
                       {droneMoving
                           ? "Moving drone..."
-                          : "Simulate Drone Movement"}
+                          : "Move selected drone station"}
                   </button>
 
                     {movementError && (
