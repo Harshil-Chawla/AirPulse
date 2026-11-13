@@ -1,29 +1,13 @@
+
 import {
     ResponsiveContainer,
-    AreaChart,
-    Area,
+    LineChart,
+    Line,
     XAxis,
     YAxis,
     CartesianGrid,
     Tooltip,
 } from "recharts";
-
-function CustomTooltip({ active, payload }) {
-    if (active && payload && payload.length) {
-        const item = payload[0].payload;
-        return (
-            <div className="aqi-chart-tooltip">
-                <span className="tooltip-time">{item.fullTime || item.time}</span>
-                <div className="tooltip-value-row">
-                    <span className="tooltip-indicator"></span>
-                    <span className="tooltip-label">AQI:</span>
-                    <strong className="tooltip-val">{payload[0].value}</strong>
-                </div>
-            </div>
-        );
-    }
-    return null;
-}
 
 function AQIChart({ readings }) {
     // Convert database readings into chart data
@@ -31,16 +15,14 @@ function AQIChart({ readings }) {
         .reverse()
         .filter((reading) => reading.aqi !== null)
         .map((reading) => ({
-            time: new Date(reading.recordedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            fullTime: new Date(reading.recordedAt).toLocaleString(),
+            time: new Date(reading.recordedAt).toLocaleString(),
             aqi: reading.aqi,
         }));
 
     if (chartData.length === 0) {
         return (
             <div className="chart-empty">
-                <span className="chart-empty-icon">📈</span>
-                <p>No historical AQI readings available for this station.</p>
+                No historical AQI readings available.
             </div>
         );
     }
@@ -48,38 +30,43 @@ function AQIChart({ readings }) {
     return (
         <div className="aqi-chart">
             <ResponsiveContainer width="100%" height={320}>
-                <AreaChart data={chartData} margin={{ top: 12, right: 16, left: -10, bottom: 0 }}>
-                    <defs>
-                        <linearGradient id="aqiGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#14b8a6" stopOpacity={0.35} />
-                            <stop offset="95%" stopColor="#14b8a6" stopOpacity={0.0} />
-                        </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.06)" vertical={false} />
+                <LineChart data={chartData}>
+                    <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="#293b50"
+                    />
+
                     <XAxis
                         dataKey="time"
-                        stroke="#64748b"
-                        tick={{ fontSize: 11, fill: "#64748b" }}
-                        tickLine={false}
-                        axisLine={{ stroke: "rgba(255, 255, 255, 0.08)" }}
+                        stroke="#94a3b8"
+                        tick={{ fontSize: 11 }}
                     />
+
                     <YAxis
-                        stroke="#64748b"
+                        stroke="#94a3b8"
                         domain={[0, "auto"]}
-                        tick={{ fontSize: 11, fill: "#64748b" }}
-                        tickLine={false}
-                        axisLine={{ stroke: "rgba(255, 255, 255, 0.08)" }}
                     />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Area
+
+                    <Tooltip
+                        contentStyle={{
+                            backgroundColor: "#17283b",
+                            border: "1px solid #34465b",
+                            borderRadius: "8px",
+                            color: "#ffffff",
+                        }}
+                        labelStyle={{ color: "#94a3b8" }}
+                    />
+
+                    <Line
                         type="monotone"
                         dataKey="aqi"
-                        stroke="#14b8a6"
-                        strokeWidth={2.5}
-                        fill="url(#aqiGradient)"
-                        activeDot={{ r: 6, fill: "#06b6d4", stroke: "#080c14", strokeWidth: 2 }}
+                        name="AQI"
+                        stroke="#5eead4"
+                        strokeWidth={3}
+                        dot={{ r: 4, fill: "#5eead4" }}
+                        activeDot={{ r: 7 }}
                     />
-                </AreaChart>
+                </LineChart>
             </ResponsiveContainer>
         </div>
     );
