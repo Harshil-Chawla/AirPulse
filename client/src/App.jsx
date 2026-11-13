@@ -47,6 +47,7 @@ function App() {
     const [historyError, setHistoryError] = useState("");
     const [movementTrails, setMovementTrails] = useState({});
     const [lastUpdated, setLastUpdated] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
 
     // Load stations initially
     useEffect(() => {
@@ -153,31 +154,31 @@ function App() {
 
     // Automatically refresh dashboard every 30 seconds
 
-useEffect(() => {
-    const refreshDashboard = async () => {
-        try {
-            const updatedStations = await fetchStations();
-            setStations(updatedStations);
+    useEffect(() => {
+        const refreshDashboard = async () => {
+            try {
+                const updatedStations = await fetchStations();
+                setStations(updatedStations);
 
-            if (selectedStationId) {
-                const updatedHistory = await fetchStationReadings(
-                    selectedStationId
-                );
-                setHistoricalReadings(updatedHistory);
+                if (selectedStationId) {
+                    const updatedHistory = await fetchStationReadings(
+                        selectedStationId
+                    );
+                    setHistoricalReadings(updatedHistory);
+                }
+
+                // Update timestamp after successful refresh
+                setLastUpdated(new Date());
+
+            } catch (err) {
+                console.error("Dashboard refresh failed:", err);
             }
+        };
 
-            // Update timestamp after successful refresh
-            setLastUpdated(new Date());
+        const intervalId = setInterval(refreshDashboard, 30000);
 
-        } catch (err) {
-            console.error("Dashboard refresh failed:", err);
-        }
-    };
-
-    const intervalId = setInterval(refreshDashboard, 30000);
-
-    return () => clearInterval(intervalId);
-}, [selectedStationId]);
+        return () => clearInterval(intervalId);
+    }, [selectedStationId]);
 
 
     // Simulate mobile station movement
@@ -214,39 +215,62 @@ useEffect(() => {
         }
     };
 
+    const handleRefresh = async () => {
+      try {
+          setRefreshing(true);
+
+          const updatedStations = await fetchStations();
+          setStations(updatedStations);
+
+          if (selectedStationId) {
+              const updatedHistory = await fetchStationReadings(
+                  selectedStationId
+              );
+              setHistoricalReadings(updatedHistory);
+          }
+
+          setLastUpdated(new Date());
+          setError("");
+      } catch (err) {
+          setError(err.message);
+      } finally {
+          setRefreshing(false);
+      }
+    };
+
     // Simulate drone station movement
-const handleMoveDroneStation = async () => {
-    const droneStation = stations.find(
-        (station) => station.type === "DRONE"
-    );
+    const handleMoveDroneStation = async () => {
+        const droneStation = stations.find(
+            (station) => station.type === "DRONE"
+        );
 
-    if (!droneStation) {
-        setMovementError("No drone station found");
-        return;
-    }
-
-    try {
-        setDroneMoving(true);
-        setMovementError("");
-
-        await simulateDroneMovement(droneStation.id);
-
-        const updatedStations = await fetchStations();
-        setStations(updatedStations);
-
-        if (selectedStationId) {
-            const updatedHistory = await fetchStationReadings(
-                selectedStationId
-            );
-            setHistoricalReadings(updatedHistory);
+        if (!droneStation) {
+            setMovementError("No drone station found");
+            return;
         }
-    } catch (err) {
-        console.error(err);
-        setMovementError(err.message);
-    } finally {
-        setDroneMoving(false);
-    }
-};
+
+        try {
+            setDroneMoving(true);
+            setMovementError("");
+
+            await simulateDroneMovement(droneStation.id);
+
+            const updatedStations = await fetchStations();
+            setStations(updatedStations);
+
+            if (selectedStationId) {
+                const updatedHistory = await fetchStationReadings(
+                    selectedStationId
+                );
+                setHistoricalReadings(updatedHistory);
+            }
+        } catch (err) {
+            console.error(err);
+            setMovementError(err.message);
+        } finally {
+            setDroneMoving(false);
+        }
+    };
 
     // Latest readings from all stations
     const readings = stations
@@ -453,6 +477,14 @@ const handleMoveDroneStation = async () => {
                           <span className="status-dot"></span>
                           LIVE MONITORING
                       </span>
+
+                      <button
+                          className="refresh-button"
+                          onClick={handleRefresh}
+                          disabled={refreshing}
+                      >
+                          {refreshing ? "Refreshing..." : "↻ Refresh"}
+                      </button>
 
                       <div className="last-updated">
                           <span>Last updated</span>
