@@ -1,4 +1,5 @@
 
+import { historyOptions } from "../lib/validation.js";
 import {
     getAllStations,
     getStationReadings,
@@ -39,7 +40,10 @@ export const fetchStationReadings = async (req, res) => {
             });
         }
 
-        const readings = await getStationReadings(stationId);
+        let options;
+        try { options = historyOptions(req.query); }
+        catch (error) { return res.status(400).json({ success: false, message: error.message }); }
+        const readings = await getStationReadings(stationId, options);
 
         res.status(200).json({
             success: true,

@@ -16,10 +16,12 @@ export const getAllStations = async () => {
     return stations;
 };
 
-export const getStationReadings = async (stationId) => {
+export const getStationReadings = async (stationId, { limit = 200, since } = {}) => {
     const readings = await prisma.reading.findMany({
+        take: limit,
         where: {
             stationId: stationId,
+            ...(since ? { recordedAt: { gte: since } } : {}),
         },
         orderBy: {
             recordedAt: "desc",
