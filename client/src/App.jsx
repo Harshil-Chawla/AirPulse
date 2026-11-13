@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "./App.css";
 
@@ -34,6 +34,12 @@ function getAQIStatus(aqi) {
 
 
 function App() {
+    const selectionRef = useRef("");
+    const selectStation = (id) => {
+        selectionRef.current = id;
+        setSelectedStationId(id);
+        setHistoricalReadings([]);
+    };
     const [stations, setStations] = useState([]);
     const [stationFilter, setStationFilter] = useState("ALL");
     const [loading, setLoading] = useState(true);
@@ -58,6 +64,7 @@ function App() {
                 setLastUpdated(new Date());
 
                 if (data.length > 0) {
+                    selectionRef.current = String(data[0].id);
                     setSelectedStationId(String(data[0].id));
                 }
             } catch (err) {
@@ -106,6 +113,7 @@ function App() {
 
     // Fetch movement history for mobile and drone stations
     useEffect(() => {
+        let ignore = false;
         const loadMovementTrails = async () => {
             try {
                 const movingStations = stations.filter(
@@ -141,7 +149,7 @@ function App() {
                     trails[stationId] = trail;
                 });
 
-                setMovementTrails(trails);
+                if (!ignore) setMovementTrails(trails);
             } catch (err) {
                 console.error("Failed to load movement trails:", err);
             }
@@ -150,6 +158,7 @@ function App() {
         if (stations.length > 0) {
             loadMovementTrails();
         }
+        return () => { ignore = true; };
     }, [stations]);
 
     // Automatically refresh dashboard every 30 seconds
@@ -164,7 +173,7 @@ function App() {
                     const updatedHistory = await fetchStationReadings(
                         selectedStationId
                     );
-                    setHistoricalReadings(updatedHistory);
+                    if (selectionRef.current === selectedStationId) { setHistoricalReadings(updatedHistory); setHistoryError(""); }
                 }
 
                 // Update timestamp after successful refresh
@@ -205,7 +214,7 @@ function App() {
                 const updatedHistory = await fetchStationReadings(
                     selectedStationId
                 );
-                setHistoricalReadings(updatedHistory);
+                if (selectionRef.current === selectedStationId) { setHistoricalReadings(updatedHistory); setHistoryError(""); }
             }
         } catch (err) {
             console.error(err);
@@ -226,7 +235,7 @@ function App() {
               const updatedHistory = await fetchStationReadings(
                   selectedStationId
               );
-              setHistoricalReadings(updatedHistory);
+              if (selectionRef.current === selectedStationId) { setHistoricalReadings(updatedHistory); setHistoryError(""); }
           }
 
           setLastUpdated(new Date());
@@ -262,7 +271,7 @@ function App() {
                 const updatedHistory = await fetchStationReadings(
                     selectedStationId
                 );
-                setHistoricalReadings(updatedHistory);
+                if (selectionRef.current === selectedStationId) { setHistoricalReadings(updatedHistory); setHistoryError(""); }
             }
         } catch (err) {
             console.error(err);
@@ -674,7 +683,7 @@ function App() {
                             id="station-history"
                             value={selectedStationId}
                             onChange={(e) =>
-                                setSelectedStationId(e.target.value)
+                                selectStation(e.target.value)
                             }
                         >
                             {stations.map((station) => (
@@ -869,7 +878,7 @@ function App() {
                                         }`}
                                         key={station.id}
                                         onClick={() =>
-                                            setSelectedStationId(
+                                            selectStation(
                                                 String(station.id)
                                             )
                                         }
