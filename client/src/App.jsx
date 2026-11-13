@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import "./App.css";
 
+import AreaSummary from "./components/AreaSummary";
 import StationMap from "./components/StationMap";
 import MapLegend from "./components/MapLegend";
 import AQIChart from "./components/AQIChart";
@@ -708,6 +709,7 @@ function App() {
                     )}
                 </section>
 
+                <AreaSummary stations={stations} />
                 {/* Fixed vs Mobile Comparison */}
                 <section className="section-block" id="comparison">
                     <div className="section-heading">
