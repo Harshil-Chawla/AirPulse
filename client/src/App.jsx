@@ -11,6 +11,7 @@ import AQIChart from "./components/AQIChart";
 import AQICategoryLegend from "./components/AQICategoryLegend";
 import StationComparison from "./components/StationComparison";
 import HotspotPanel from "./components/HotspotPanel";
+import CoverageIntelligence from "./components/CoverageIntelligence";
 
 
 import {
@@ -460,6 +461,10 @@ function App() {
                         <span>🔥</span> Hotspots
                     </a>
 
+                    <a href="#coverage" className="nav-link">
+                        <span>🌐</span> Coverage Gaps
+                    </a>
+
                     <a href="#stations" className="nav-link">
                         <span>⌖</span> Monitoring Stations
                     </a>
@@ -741,6 +746,9 @@ function App() {
                 </section>
 
                 <AreaSummary stations={stations} />
+
+                {/* Coverage Intelligence & Gaps */}
+                <CoverageIntelligence stations={stations} />
                 {/* Fixed vs Mobile Comparison */}
                 <section className="section-block" id="comparison">
                     <div className="section-heading">
