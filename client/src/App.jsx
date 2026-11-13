@@ -13,6 +13,7 @@ import StationComparison from "./components/StationComparison";
 import HotspotPanel from "./components/HotspotPanel";
 import CoverageIntelligence from "./components/CoverageIntelligence";
 import DeploymentRecommendations from "./components/DeploymentRecommendations";
+import { getDominantPollutant } from "./utils/hotspotDetection";
 
 
 import {
@@ -947,9 +948,16 @@ function App() {
                                         <div className="station-info">
                                             <h3>{station.name}</h3>
                                             <p>{station.city}, India</p>
-                                            <span className="station-type">
-                                                {station.type}
-                                            </span>
+                                            <div className="station-type-tags">
+                                                <span className="station-type">
+                                                    {station.type}
+                                                </span>
+                                                {reading && (
+                                                    <span className="dominant-chip">
+                                                        {getDominantPollutant(reading) || "PM2.5"}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
 
                                         <div className="station-aqi-column">

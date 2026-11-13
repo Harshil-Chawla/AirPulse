@@ -8,6 +8,7 @@ import {
 } from "react-leaflet";
 
 import "leaflet/dist/leaflet.css";
+import { getDominantPollutant } from "../utils/hotspotDetection.js";
 
 function StationMap({ stations, movementTrails }) {
     const firstStation = stations[0];
@@ -91,6 +92,8 @@ function StationMap({ stations, movementTrails }) {
                                 Type: {station.type}
                                 <br />
                                 AQI: {reading?.aqi ?? "Unavailable"}
+                                <br />
+                                Dominant: {getDominantPollutant(reading) ?? "Unavailable"}
                                 <br />
                                 PM2.5: {reading?.pm25 ?? "Unavailable"}
                                 <br />

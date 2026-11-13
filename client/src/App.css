@@ -2000,6 +2000,84 @@ button {
     color: #bfdbfe;
 }
 
+/* ==========================================================================
+   POLLUTANT INTELLIGENCE & COMPARISON ENHANCEMENTS
+   ========================================================================== */
+
+.pollutant-intelligence-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 20px;
+    background: #111a28;
+    border: 1px solid #1e2c3e;
+    border-radius: 12px;
+    padding: 14px 20px;
+}
+
+.intel-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.intel-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #64748b;
+    background: #0b1320;
+    padding: 3px 8px;
+    border-radius: 5px;
+    border: 1px solid #1a273b;
+}
+
+.intel-highlight {
+    color: #5eead4;
+    font-weight: 700;
+}
+
+.intel-text {
+    color: #cbd5e1;
+    font-size: 12px;
+}
+
+.chart-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.chart-header-row h3 {
+    margin: 0;
+}
+
+.chart-sub {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.station-type-tags {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.dominant-chip {
+    font-size: 10px;
+    font-weight: 700;
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+
+
 
 
 
