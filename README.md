@@ -4,9 +4,13 @@ Student prototype for comparing fixed, mobile and drone pollution readings aroun
 
 ## Frontend preview
 
+Run with standalone in-memory demo data (no database or backend required):
+
 ```sh
 cd client
 npm ci
+cp .env.example .env
+# Set VITE_DEMO_MODE=true in .env, or pass directly:
 VITE_DEMO_MODE=true npm run dev
 ```
 

@@ -36,3 +36,12 @@ test('demo history is bounded and a fresh store resets changes', async () => {
     assert.equal((await store.readings(3)).length, 200);
     assert.equal((await createDemoStore().readings(3)).length, 12);
 });
+test('demo movement maintains coordinate bounds across repeated drone movements', async () => {
+    const store = createDemoStore();
+    for (let i = 0; i < 50; i++) await store.move(3, 'DRONE');
+    const readings = await store.readings(3);
+    for (const r of readings) {
+        assert.ok(r.latitude >= -90 && r.latitude <= 90);
+        assert.ok(r.longitude >= -180 && r.longitude < 180);
+    }
+});
