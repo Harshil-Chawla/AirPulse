@@ -10,6 +10,7 @@ const StationMap = lazy(() => import("./components/StationMap"));
 import AQIChart from "./components/AQIChart";
 import AQICategoryLegend from "./components/AQICategoryLegend";
 import StationComparison from "./components/StationComparison";
+import HotspotPanel from "./components/HotspotPanel";
 
 
 import {
@@ -455,6 +456,10 @@ function App() {
                         <span>▦</span> Overview
                     </a>
 
+                    <a href="#hotspots" className="nav-link">
+                        <span>🔥</span> Hotspots
+                    </a>
+
                     <a href="#stations" className="nav-link">
                         <span>⌖</span> Monitoring Stations
                     </a>
@@ -623,6 +628,9 @@ function App() {
 
                     <AQICategoryLegend />
                 </div>
+
+                {/* Pollution Hotspot Detection */}
+                <HotspotPanel stations={stations} />
 
                 {/* Pollutant Cards */}
                 <section className="section-block" id="pollutants">

@@ -1453,3 +1453,150 @@ button {
     }
 }
 
+/* ==========================================================================
+   POLLUTION HOTSPOT DETECTION
+   ========================================================================== */
+
+.hotspot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.hotspot-card {
+    background: linear-gradient(145deg, #131f30, #0f1826);
+    border: 1px solid #1f2f45;
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.hotspot-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+}
+
+.hotspot-card.severe-border { border-left: 4px solid #a855f7; }
+.hotspot-card.very-poor-border { border-left: 4px solid #ef4444; }
+.hotspot-card.poor-border { border-left: 4px solid #f97316; }
+.hotspot-card.moderate-border { border-left: 4px solid #eab308; }
+.hotspot-card.satisfactory-border { border-left: 4px solid #84cc16; }
+.hotspot-card.good-border { border-left: 4px solid #22c55e; }
+
+.hotspot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.hotspot-rank {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rank-num {
+    background: #1e293b;
+    color: #f1f5f9;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 6px;
+    border: 1px solid #334155;
+}
+
+.hotspot-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+
+.hotspot-type-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.hotspot-type-tag.fixed-tag { background: #1e3a5f; color: #60a5fa; }
+.hotspot-type-tag.mobile-tag { background: #1e293b; color: #38bdf8; }
+.hotspot-type-tag.drone-tag { background: #3b1d54; color: #c084fc; }
+
+.hotspot-body {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.hotspot-aqi-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 65px;
+    padding: 8px 12px;
+    background: #0b1320;
+    border: 1px solid #1a273b;
+    border-radius: 10px;
+}
+
+.hotspot-aqi-val {
+    font-family: 'Outfit', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #f8fafc;
+    line-height: 1;
+}
+
+.hotspot-aqi-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.5px;
+    margin-top: 3px;
+}
+
+.hotspot-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 12px;
+}
+
+.severity-pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 5px;
+}
+
+.severity-pill.severe { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+.severity-pill.very-poor { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.severity-pill.poor { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+.severity-pill.moderate { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+.severity-pill.satisfactory { background: rgba(132, 204, 22, 0.2); color: #a3e635; }
+.severity-pill.good { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+
+.hotspot-pollutant {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.hotspot-pollutant strong {
+    color: #e2e8f0;
+}
+
+.hotspot-coords {
+    color: #64748b;
+    font-size: 10px;
+    letter-spacing: 0.3px;
+}
+
+
