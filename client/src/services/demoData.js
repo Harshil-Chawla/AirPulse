@@ -20,8 +20,11 @@ export function createDemoStore() {
             if (!station || station.type !== type) throw new Error("Select a matching demo station");
             const rows = history.get(station.id);
             const latest = rows[0];
+            const step = type === "DRONE" ? 0.004 : 0.002;
+            const latitude = Math.max(-90, Math.min(90, latest.latitude + (Math.random() - 0.5) * step));
+            const longitude = ((latest.longitude + (Math.random() - 0.5) * step + 540) % 360) - 180;
             const reading = { ...latest, id: latest.id + 1,
-                latitude: latest.latitude + 0.0005, longitude: latest.longitude + 0.0005,
+                latitude, longitude,
                 recordedAt: new Date().toISOString() };
             rows.unshift(reading);
             rows.length = Math.min(rows.length, 200);
