@@ -2,7 +2,8 @@
 import {
     getAllStations,
     getStationReadings,
-    simulateMobileMovement
+    simulateMobileMovement,
+    simulateDroneMovement
 } from "../services/stationService.js";
 
 
@@ -83,4 +84,32 @@ export const moveMobileStation = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+export const moveDroneStation = async (req, res) => {
+    try {
+        const stationId = Number(req.params.id);
+
+        if (!Number.isInteger(stationId) || stationId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid station ID",
+            });
+        }
+
+        const reading = await simulateDroneMovement(stationId);
+
+        return res.status(201).json({
+            success: true,
+            message: "Simulated drone movement recorded",
+            reading,
+        });
+    } catch (error) {
+        const status = error.message === "Station not found" ? 404 : 400;
+
+        return res.status(status).json({
+            success: false,
+            message: error.message,
+        });
+    }
 };
