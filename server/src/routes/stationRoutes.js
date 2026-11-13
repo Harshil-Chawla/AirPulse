@@ -3,6 +3,7 @@ import express from "express";
 import {
     fetchStations,
     fetchStationReadings,
+    fetchStationAggregates,
     moveMobileStation,
     moveDroneStation
 } from "../controllers/stationController.js";
@@ -17,6 +18,7 @@ router.use((req, res, next) => {
 
 router.get("/", fetchStations);
 router.get("/:id/readings", fetchStationReadings);
+router.get("/:id/stats", fetchStationAggregates);
 router.post("/:id/simulate-movement", moveMobileStation);
 router.post("/:id/simulate-drone-movement", moveDroneStation);
 
