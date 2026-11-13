@@ -43,6 +43,7 @@ function App() {
     const [stations, setStations] = useState([]);
     const [stationFilter, setStationFilter] = useState("ALL");
     const [loading, setLoading] = useState(true);
+    const [refreshError, setRefreshError] = useState("");
     const [error, setError] = useState("");
     const [movementError, setMovementError] = useState("");
     const [moving, setMoving] = useState(false);
@@ -62,6 +63,7 @@ function App() {
                 const data = await fetchStations();
                 setStations(data);
                 setLastUpdated(new Date());
+                setRefreshError("");
 
                 if (data.length > 0) {
                     selectionRef.current = String(data[0].id);
@@ -178,8 +180,10 @@ function App() {
 
                 // Update timestamp after successful refresh
                 setLastUpdated(new Date());
+                setRefreshError("");
 
             } catch (err) {
+                setRefreshError("Refresh failed. Showing previously loaded data.");
                 console.error("Dashboard refresh failed:", err);
             }
         };
@@ -197,7 +201,7 @@ function App() {
         );
 
         if (!mobileStation) {
-            setError("No mobile station found");
+            setMovementError("No mobile station found");
             return;
         }
 
@@ -239,9 +243,10 @@ function App() {
           }
 
           setLastUpdated(new Date());
+                setRefreshError("");
           setError("");
       } catch (err) {
-          setError(err.message);
+          setRefreshError(err.message);
       } finally {
           setRefreshing(false);
       }
@@ -459,7 +464,7 @@ function App() {
                     <div className="system-status">
                         <span className="status-dot"></span>
                         <div>
-                            <strong>System Online</strong>
+                            <strong>{refreshError ? "Refresh interrupted" : "Data loaded"}</strong>
                             <p>Backend connected</p>
                         </div>
                     </div>
@@ -510,6 +515,7 @@ function App() {
                   </div>
                 </header>
 
+                {refreshError && <p role="status">{refreshError}</p>}
                 {/* AQI Overview */}
                 <section className="hero-grid" id="overview">
 
