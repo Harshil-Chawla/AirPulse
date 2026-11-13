@@ -8,6 +8,12 @@ import {
 } from "../controllers/stationController.js";
 
 const router = express.Router();
+router.use((req, res, next) => {
+    if (req.method === "POST" && process.env.ENABLE_SIMULATION !== "true") {
+        return res.status(403).json({ success: false, message: "Simulation is disabled" });
+    }
+    next();
+});
 
 router.get("/", fetchStations);
 router.get("/:id/readings", fetchStationReadings);
