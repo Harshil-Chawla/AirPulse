@@ -1284,3 +1284,4 @@ button {
     opacity: 0.6;
     cursor: not-allowed;
 }
+.station-row:focus-visible { outline: 3px solid #5eead4; outline-offset: 3px; }

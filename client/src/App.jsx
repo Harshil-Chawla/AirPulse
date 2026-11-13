@@ -6,7 +6,7 @@ import "./App.css";
 import { downloadReadings } from "./utils/exportReadings";
 import AreaSummary from "./components/AreaSummary";
 import StationMap from "./components/StationMap";
-import MapLegend from "./components/MapLegend";
+
 import AQIChart from "./components/AQIChart";
 import AQICategoryLegend from "./components/AQICategoryLegend";
 import StationComparison from "./components/StationComparison";
@@ -312,17 +312,6 @@ function App() {
     const droneCount = stations.filter(
         (station) => station.type === "DRONE"
     ).length;
-
-    const fixedStation = stations.find(
-    (station) => station.type === "FIXED"
-    );
-
-    const mobileStation = stations.find(
-        (station) => station.type === "MOBILE"
-    );
-
-    const fixedReading = fixedStation?.readings?.[0];
-    const mobileReading = mobileStation?.readings?.[0];
 
     // Highest pollutant reading
     
@@ -769,7 +758,7 @@ function App() {
                         <p className="movement-error">{movementError}</p>
                     )}
 
-                    <MapLegend />
+
 
                     <StationMap
                         stations={stations}
@@ -884,6 +873,14 @@ function App() {
                                                 : ""
                                         }`}
                                         key={station.id}
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-pressed={String(selectedStationId) === String(station.id)}
+                                        onKeyDown={(event) => {
+                                            if (event.key === "Enter" || event.key === " ") {
+                                                event.preventDefault(); selectStation(String(station.id));
+                                            }
+                                        }}
                                         onClick={() =>
                                             selectStation(
                                                 String(station.id)
