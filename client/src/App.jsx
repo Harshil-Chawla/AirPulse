@@ -39,6 +39,7 @@ function getAQIStatus(aqi) {
 
 function App() {
     const selectionRef = useRef("");
+    const refreshAbortRef = useRef(null);
     const selectStation = (id) => {
         selectionRef.current = id;
         setSelectedStationId(id);
@@ -171,13 +172,18 @@ function App() {
 
     useEffect(() => {
         const refreshDashboard = async () => {
+            // Cancel any in-flight readings fetch from a previous refresh
+            if (refreshAbortRef.current) refreshAbortRef.current.abort();
+            const controller = new AbortController();
+            refreshAbortRef.current = controller;
             try {
                 const updatedStations = await fetchStations();
                 setStations(updatedStations);
 
                 if (selectedStationId) {
                     const updatedHistory = await fetchStationReadings(
-                        selectedStationId
+                        selectedStationId,
+                        controller.signal
                     );
                     if (selectionRef.current === selectedStationId) { setHistoricalReadings(updatedHistory); setHistoryError(""); }
                 }
@@ -187,6 +193,7 @@ function App() {
                 setRefreshError("");
 
             } catch (err) {
+                if (err.name === "AbortError") return;
                 setRefreshError("Refresh failed. Showing previously loaded data.");
                 console.error("Dashboard refresh failed:", err);
             }
@@ -231,6 +238,11 @@ function App() {
     };
 
     const handleRefresh = async () => {
+      if (refreshing) return;
+      // Cancel any in-flight readings fetch from auto-refresh
+      if (refreshAbortRef.current) refreshAbortRef.current.abort();
+      const controller = new AbortController();
+      refreshAbortRef.current = controller;
       try {
           setRefreshing(true);
 
@@ -239,7 +251,8 @@ function App() {
 
           if (selectedStationId) {
               const updatedHistory = await fetchStationReadings(
-                  selectedStationId
+                  selectedStationId,
+                  controller.signal
               );
               if (selectionRef.current === selectedStationId) { setHistoricalReadings(updatedHistory); setHistoryError(""); }
           }
@@ -248,6 +261,7 @@ function App() {
                 setRefreshError("");
           setError("");
       } catch (err) {
+          if (err.name === "AbortError") return;
           setRefreshError(err.message);
       } finally {
           setRefreshing(false);
