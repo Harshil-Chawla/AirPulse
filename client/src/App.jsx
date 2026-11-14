@@ -11,6 +11,7 @@ const StationMap = lazy(() => import("./components/StationMap"));
 
 import AQIChart from "./components/AQIChart";
 import AQICategoryLegend from "./components/AQICategoryLegend";
+import StationPair from "./components/StationPair";
 import StationComparison from "./components/StationComparison";
 import HotspotPanel from "./components/HotspotPanel";
 import AnomalyAlerts from "./components/AnomalyAlerts";
@@ -786,6 +787,7 @@ function App() {
                     )}
                 </section>
 
+                <StationPair stations={stations} />
                 <AreaSummary stations={stations} />
 
                 {/* Coverage Intelligence & Gaps */}

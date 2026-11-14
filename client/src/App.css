@@ -2950,3 +2950,8 @@ button {
 
 .map-actions { position: absolute; z-index: 1000; top: 6px; right: 12px; left: 55px; justify-content: flex-end; pointer-events: none; }
 .map-actions button { pointer-events: auto; }
+
+.comparison-table-wrap { overflow-x: auto; }
+.comparison-table { width: 100%; border-collapse: collapse; text-align: left; }
+.comparison-table th, .comparison-table td { padding: 12px; border-bottom: 1px solid #34465b; }
+.comparison-table caption { text-align: left; padding: 12px 0; color: #94a3b8; }
