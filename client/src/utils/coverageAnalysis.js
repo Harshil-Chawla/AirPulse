@@ -1,3 +1,5 @@
+import { calculateDistanceKm } from "./anomalyDetection.js";
+
 export function analyzeCoverage(stations) {
     if (!Array.isArray(stations) || stations.length === 0) {
         return {
@@ -129,4 +131,98 @@ export function analyzeCoverage(stations) {
         coverageGaps,
         gapCount: coverageGaps.length,
     };
+}
+
+/**
+ * Intelligent Monitoring Spatial Gap Assessment
+ * 
+ * Computes spatial isolation distance to the nearest station and prioritizes
+ * coverage gaps based on isolation distance combined with surrounding pollution severity.
+ * 
+ * @param {Array<{lat: number, lon: number, name?: string}>} candidateLocations - Geographic checkpoints
+ * @param {Array<object>} stations - Monitored stations
+ * @param {object} [options] - Configurations
+ */
+export function evaluateSpatialCoverageGaps(candidateLocations = [], stations = [], options = {}) {
+    if (!Array.isArray(candidateLocations) || candidateLocations.length === 0) return [];
+    if (!Array.isArray(stations) || stations.length === 0) return [];
+
+    const locatedStations = stations
+        .map(s => {
+            const r = s.readings?.[0];
+            const lat = r?.latitude ?? s.latitude;
+            const lon = r?.longitude ?? s.longitude;
+            return {
+                id: s.id,
+                name: s.name,
+                lat,
+                lon,
+                aqi: Number.isFinite(r?.aqi) ? r.aqi : null,
+            };
+        })
+        .filter(s => Number.isFinite(s.lat) && Number.isFinite(s.lon));
+
+    if (locatedStations.length === 0) return [];
+
+    const gapAssessments = [];
+    const maxThresholdKm = options.maxThresholdKm ?? 15.0;
+
+    for (const loc of candidateLocations) {
+        if (!loc || !Number.isFinite(loc.lat) || !Number.isFinite(loc.lon)) continue;
+
+        // Calculate distances to all existing stations
+        let nearestDistKm = Infinity;
+        let nearestStation = null;
+        let regionalAqiSum = 0;
+        let regionalAqiCount = 0;
+
+        for (const st of locatedStations) {
+            const dist = calculateDistanceKm(loc.lat, loc.lon, st.lat, st.lon);
+            if (dist < nearestDistKm) {
+                nearestDistKm = dist;
+                nearestStation = st;
+            }
+            if (dist <= maxThresholdKm && st.aqi !== null) {
+                regionalAqiSum += st.aqi;
+                regionalAqiCount++;
+            }
+        }
+
+        const surroundingAvgAQI = regionalAqiCount > 0 ? Math.round(regionalAqiSum / regionalAqiCount) : null;
+
+        // Priority calculation:
+        // Distance isolation score (0 - 60 points): higher distance -> bigger gap
+        const distanceScore = Math.min(60, Math.round((nearestDistKm / 10.0) * 60));
+        // Severity score (0 - 40 points): higher surrounding AQI -> more urgent monitoring
+        const severityScore = surroundingAvgAQI ? Math.min(40, Math.round((surroundingAvgAQI / 300) * 40)) : 15;
+        const compositePriority = distanceScore + severityScore;
+
+        let priorityLevel = "LOW";
+        if (compositePriority >= 70 || nearestDistKm >= 6.0) priorityLevel = "HIGH";
+        else if (compositePriority >= 45 || nearestDistKm >= 3.0) priorityLevel = "MEDIUM";
+
+        const reasoning = [];
+        if (nearestDistKm >= 5.0) reasoning.push(`Severe isolation: ${nearestDistKm.toFixed(2)} km from nearest station (${nearestStation?.name})`);
+        else reasoning.push(`Moderate coverage: ${nearestDistKm.toFixed(2)} km from nearest station (${nearestStation?.name})`);
+
+        if (surroundingAvgAQI && surroundingAvgAQI >= 180) {
+            reasoning.push(`Elevated surrounding regional air pollution (~${surroundingAvgAQI} AQI) requires dense local coverage`);
+        }
+
+        gapAssessments.push({
+            locationName: loc.name || `Checkpoint (${loc.lat.toFixed(3)}, ${loc.lon.toFixed(3)})`,
+            lat: loc.lat,
+            lon: loc.lon,
+            nearestStationDistanceKm: Number(nearestDistKm.toFixed(2)),
+            nearestStationName: nearestStation?.name || "None",
+            surroundingAvgAQI,
+            distanceScore,
+            severityScore,
+            compositePriority,
+            priorityLevel,
+            reasoning: reasoning.join("; "),
+        });
+    }
+
+    return gapAssessments.sort((a, b) => b.compositePriority - a.compositePriority);
 }

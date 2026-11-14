@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { analyzeCoverage } from '../src/utils/coverageAnalysis.js';
+import { analyzeCoverage, evaluateSpatialCoverageGaps } from '../src/utils/coverageAnalysis.js';
 
 test('analyzeCoverage correctly identifies coverage gaps and computes dynamic coverage ratio', () => {
     const stations = [
@@ -11,7 +11,6 @@ test('analyzeCoverage correctly identifies coverage gaps and computes dynamic co
 
     const result = analyzeCoverage(stations);
     assert.equal(result.totalStations, 3);
-    // 2 out of 3 stations are mobile/drone = 67%
     assert.equal(result.coverageScore, 67);
     assert.ok(result.activeSectors.length > 0);
     assert.ok(result.gapCount >= 0);
@@ -24,7 +23,7 @@ test('analyzeCoverage flags fixed-only sectors with high AQI as High priority ga
 
     const result = analyzeCoverage(stations);
     assert.equal(result.totalStations, 1);
-    assert.equal(result.coverageScore, 0); // 0% dynamic
+    assert.equal(result.coverageScore, 0);
     assert.equal(result.coverageGaps.length, 1);
     assert.equal(result.coverageGaps[0].priority, 'HIGH');
     assert.ok(result.coverageGaps[0].gapReason.includes('High pollution reported with zero mobile/drone verification'));
@@ -40,4 +39,34 @@ test('analyzeCoverage handles empty and unlocated station arrays safely', () => 
         { id: 1, name: 'Station Without Coords', type: 'FIXED', readings: [{ aqi: 100, latitude: null, longitude: null }] }
     ]);
     assert.equal(unlocatedResult.totalStations, 0);
+});
+
+test('evaluateSpatialCoverageGaps: ranks isolated areas with high surrounding pollution highest', () => {
+    const stations = [
+        { id: 1, name: 'Central Delhi', type: 'FIXED', readings: [{ aqi: 240, latitude: 28.6139, longitude: 77.2090 }] },
+        { id: 2, name: 'West Delhi', type: 'FIXED', readings: [{ aqi: 200, latitude: 28.6300, longitude: 77.1000 }] },
+    ];
+
+    const candidateCheckpoints = [
+        { name: 'Isolated East Industrial Border', lat: 28.6139, lon: 77.3500 }, // ~13.7 km from Central Delhi
+        { name: 'Nearby Central Park', lat: 28.6150, lon: 77.2100 },            // ~0.15 km from Central Delhi
+    ];
+
+    const gaps = evaluateSpatialCoverageGaps(candidateCheckpoints, stations);
+    assert.equal(gaps.length, 2);
+
+    const isolated = gaps.find(g => g.locationName.includes('Isolated'));
+    const nearby = gaps.find(g => g.locationName.includes('Nearby'));
+
+    assert.ok(isolated.nearestStationDistanceKm > 10.0);
+    assert.ok(nearby.nearestStationDistanceKm < 1.0);
+    assert.equal(isolated.priorityLevel, 'HIGH');
+    assert.ok(isolated.compositePriority > nearby.compositePriority);
+    assert.ok(isolated.reasoning.includes('Severe isolation'));
+});
+
+test('evaluateSpatialCoverageGaps: handles empty or invalid coordinates safely', () => {
+    assert.deepEqual(evaluateSpatialCoverageGaps([], []), []);
+    assert.deepEqual(evaluateSpatialCoverageGaps(null, []), []);
+    assert.deepEqual(evaluateSpatialCoverageGaps([{ lat: null, lon: null }], []), []);
 });
