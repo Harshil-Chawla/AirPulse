@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { detectHotspots, getDominantPollutant } from '../src/utils/hotspotDetection.js';
+import { detectHotspots, getDominantPollutant, prioritizeHotspots } from '../src/utils/hotspotDetection.js';
 
 test('detectHotspots ranks stations by AQI severity in descending order', () => {
     const stations = [
@@ -41,4 +41,49 @@ test('getDominantPollutant identifies the pollutant with highest benchmark ratio
     assert.equal(getDominantPollutant(pm10Dominant), 'PM10');
 
     assert.equal(getDominantPollutant(null), null);
+});
+
+test('prioritizeHotspots distinguishes chronic recurring hotspots from transient spikes', () => {
+    const stations = [
+        { id: 1, name: 'Chronic Industrial', type: 'FIXED', readings: [{ aqi: 220, recordedAt: '2026-11-14T10:00:00Z' }] },
+        { id: 2, name: 'Transient Spike', type: 'MOBILE', readings: [{ aqi: 240, recordedAt: '2026-11-14T10:00:00Z' }] },
+    ];
+
+    // Station 1 has chronic high pollution history
+    const histories = {
+        1: [
+            { aqi: 210 }, { aqi: 230 }, { aqi: 195 }, { aqi: 220 },
+        ],
+        // Station 2 has low background with single transient peak
+        2: [
+            { aqi: 50 }, { aqi: 60 }, { aqi: 45 }, { aqi: 70 },
+        ],
+    };
+
+    const prioritized = prioritizeHotspots(stations, histories, { now: '2026-11-14T10:05:00Z' });
+    assert.equal(prioritized.length, 2);
+
+    const chronic = prioritized.find(p => p.id === 1);
+    const transient = prioritized.find(p => p.id === 2);
+
+    assert.equal(chronic.recurrenceCategory, 'CHRONIC_HOTSPOT');
+    assert.equal(transient.recurrenceCategory, 'TRANSIENT_SPIKE');
+    // Chronic hotspot should rank higher despite slightly lower current reading
+    assert.ok(chronic.priorityScore > transient.priorityScore);
+    assert.ok(chronic.explanation.includes('Persistent elevated baseline'));
+});
+
+test('prioritizeHotspots downweights stale readings and handles empty collections safely', () => {
+    assert.deepEqual(prioritizeHotspots([]), []);
+    assert.deepEqual(prioritizeHotspots(null), []);
+
+    const stations = [
+        { id: 1, name: 'Fresh', type: 'FIXED', readings: [{ aqi: 200, recordedAt: '2026-11-14T12:00:00Z' }] },
+        { id: 2, name: 'Stale', type: 'FIXED', readings: [{ aqi: 200, recordedAt: '2026-11-14T08:00:00Z' }] }, // 4 hours old
+    ];
+
+    const results = prioritizeHotspots(stations, {}, { now: '2026-11-14T12:05:00Z' });
+    assert.equal(results.length, 2);
+    assert.equal(results[0].id, 1, 'Fresh reading should take priority over stale');
+    assert.ok(results[0].priorityScore > results[1].priorityScore);
 });
