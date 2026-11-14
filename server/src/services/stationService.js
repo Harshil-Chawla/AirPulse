@@ -1,5 +1,36 @@
 import { prisma } from "../lib/prisma.js";
 
+// LRU / TTL Cache for repeated recent station lookups (avoids duplicate round trips)
+const stationExistenceCache = new Map();
+const STATION_CACHE_TTL_MS = 60000; // 60 seconds
+
+async function checkStationExists(stationId) {
+    const cached = stationExistenceCache.get(stationId);
+    const now = Date.now();
+    if (cached && (now - cached.timestamp) < STATION_CACHE_TTL_MS) {
+        if (!cached.exists) throw new Error("Station not found");
+        return true;
+    }
+
+    // Optimization: query only the primary key id rather than full record
+    const station = await prisma.station.findUnique({
+        where: { id: stationId },
+        select: { id: true },
+    });
+
+    stationExistenceCache.set(stationId, {
+        exists: !!station,
+        timestamp: now,
+    });
+
+    if (!station) throw new Error("Station not found");
+    return true;
+}
+
+export const clearStationCache = () => {
+    stationExistenceCache.clear();
+};
+
 export const getAllStations = async () => {
     const stations = await prisma.station.findMany({
         include: {
@@ -15,13 +46,19 @@ export const getAllStations = async () => {
     return stations;
 };
 
-export const getStationReadings = async (stationId, { limit = 200, since } = {}) => {
-    if (!await prisma.station.findUnique({ where: { id: stationId } })) throw new Error("Station not found");
+export const getStationReadings = async (stationId, { limit = 200, since, until } = {}) => {
+    await checkStationExists(stationId);
+
+    // Optimized time range filter using composite index [stationId, recordedAt]
+    const recordedAtFilter = {};
+    if (since) recordedAtFilter.gte = since;
+    if (until) recordedAtFilter.lte = until;
+
     const readings = await prisma.reading.findMany({
         take: limit,
         where: {
             stationId: stationId,
-            ...(since ? { recordedAt: { gte: since } } : {}),
+            ...(Object.keys(recordedAtFilter).length > 0 ? { recordedAt: recordedAtFilter } : {}),
         },
         orderBy: {
             recordedAt: "desc",
@@ -31,13 +68,18 @@ export const getStationReadings = async (stationId, { limit = 200, since } = {})
     return readings;
 };
 
-export const getStationAggregates = async (stationId, { limit = 1000, since } = {}) => {
-    if (!await prisma.station.findUnique({ where: { id: stationId } })) throw new Error("Station not found");
+export const getStationAggregates = async (stationId, { limit = 1000, since, until } = {}) => {
+    await checkStationExists(stationId);
+
+    const recordedAtFilter = {};
+    if (since) recordedAtFilter.gte = since;
+    if (until) recordedAtFilter.lte = until;
+
     const readings = await prisma.reading.findMany({
         take: limit,
         where: {
             stationId: stationId,
-            ...(since ? { recordedAt: { gte: since } } : {}),
+            ...(Object.keys(recordedAtFilter).length > 0 ? { recordedAt: recordedAtFilter } : {}),
         },
         orderBy: {
             recordedAt: "desc",

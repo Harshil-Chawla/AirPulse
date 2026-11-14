@@ -1,9 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-let station, baseline, query;
+let station, baseline, query, findUniqueCalls = 0;
 const prisma = {
-    station: { findUnique: async () => station },
+    station: {
+        findUnique: async () => {
+            findUniqueCalls++;
+            return station;
+        },
+    },
     reading: {
         findFirst: async () => baseline,
         findMany: async args => { query = args; return []; },
@@ -41,11 +46,30 @@ test('fixed and missing stations reject simulation', async () => {
     await assert.rejects(service.simulateDroneMovement(1), /Station type/);
 });
 test('history filters by station, start time and count', async () => {
+    if (service.clearStationCache) service.clearStationCache();
     station = { id: 1 };
     const since = new Date('2026-11-13');
     await service.getStationReadings(1, { limit: 10, since });
     assert.equal(query.take, 10);
     assert.deepEqual(query.where, { stationId: 1, recordedAt: { gte: since } });
     station = null;
+    if (service.clearStationCache) service.clearStationCache();
     await assert.rejects(service.getStationReadings(99), /Station not found/);
+});
+test('performance optimization: station lookup cache eliminates redundant DB round trips', async () => {
+    if (service.clearStationCache) service.clearStationCache();
+    station = { id: 42 };
+    findUniqueCalls = 0;
+
+    await service.getStationReadings(42, { limit: 5 });
+    assert.equal(findUniqueCalls, 1);
+
+    // Second call within TTL should reuse cache and not invoke findUnique again
+    await service.getStationReadings(42, { limit: 10 });
+    assert.equal(findUniqueCalls, 1, 'Subsequent reading request reused station cache');
+
+    // Also supports time-bracket queries (since & until) efficiently
+    const until = new Date('2026-11-14');
+    await service.getStationReadings(42, { limit: 15, until });
+    assert.deepEqual(query.where.recordedAt, { lte: until });
 });
