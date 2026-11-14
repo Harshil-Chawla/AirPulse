@@ -2947,3 +2947,6 @@ button {
 .dashboard-controls button { cursor: pointer; }
 .dashboard-controls button:disabled { opacity: .5; cursor: not-allowed; }
 .dashboard-controls :focus-visible { outline: 3px solid #5eead4; outline-offset: 2px; }
+
+.map-actions { position: absolute; z-index: 1000; top: 6px; right: 12px; left: 55px; justify-content: flex-end; pointer-events: none; }
+.map-actions button { pointer-events: auto; }

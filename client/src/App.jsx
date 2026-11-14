@@ -864,6 +864,7 @@ function App() {
                     <Suspense fallback={<p>Loading map...</p>}>
                     <StationMap
                         stations={stations}
+                        selectedStationId={selectedStationId}
                         movementTrails={movementTrails}
                     />
                     </Suspense>

@@ -1,5 +1,6 @@
 
 import {
+    useMap,
     MapContainer,
     TileLayer,
     CircleMarker,
@@ -9,8 +10,19 @@ import {
 
 import "leaflet/dist/leaflet.css";
 import { getDominantPollutant } from "../utils/hotspotDetection.js";
+import { stationPosition } from "../utils/mapPositions";
 
-function StationMap({ stations, movementTrails }) {
+function MapControls({ stations, selectedStationId }) {
+    const map = useMap();
+    const selected = stationPosition(stations.find(s => String(s.id) === selectedStationId));
+    const positions = stations.map(stationPosition).filter(Boolean);
+    return <div className="map-actions dashboard-controls">
+        <button disabled={!selected} onClick={() => map.flyTo(selected, 15)}>Focus selected station</button>
+        <button disabled={!positions.length} onClick={() => map.fitBounds(positions, { padding: [30, 30], maxZoom: 15 })}>Show all stations</button>
+    </div>;
+}
+
+function StationMap({ stations, movementTrails, selectedStationId }) {
     const firstStation = stations[0];
 
     const center = firstStation
@@ -31,6 +43,7 @@ function StationMap({ stations, movementTrails }) {
                 scrollWheelZoom={true}
                 className="station-map"
             >
+                <MapControls stations={stations} selectedStationId={selectedStationId} />
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -66,6 +79,7 @@ function StationMap({ stations, movementTrails }) {
 
                 {stations.map((station) => {
                     const reading = station.readings?.[0];
+                    if (!stationPosition(station)) return null;
 
                     // Use the latest reading location for mobile stations.
                     const latitude =

@@ -16,3 +16,10 @@ test('history windows exclude future and invalid dates and include boundary', ()
     assert.equal(historyInWindow([...rows, { recordedAt: 'bad' }], '1', now).length, 1);
     assert.equal(historyInWindow(rows, 'all', now), rows);
 });
+
+import { stationPosition } from '../src/utils/mapPositions.js';
+test('map focus prefers latest location and rejects invalid coordinates', () => {
+    assert.deepEqual(stationPosition({ latitude: 28, longitude: 77, readings: [{ latitude: 0, longitude: 0 }] }), [0, 0]);
+    assert.equal(stationPosition({ latitude: 91, longitude: 77 }), null);
+    assert.equal(stationPosition(null), null);
+});
