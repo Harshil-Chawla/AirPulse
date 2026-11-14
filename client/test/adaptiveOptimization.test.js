@@ -4,7 +4,6 @@ import {
     evaluateCandidateWaypoint,
     computeAdaptiveDeployments,
     VEHICLE_CONSTRAINTS,
-    OPTIMIZATION_WEIGHTS,
 } from '../src/utils/adaptiveMonitoringOptimization.js';
 
 test('evaluateCandidateWaypoint computes transparent weighted multi-criteria priority score', () => {

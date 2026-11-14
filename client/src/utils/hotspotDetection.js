@@ -35,8 +35,8 @@ export function detectHotspots(stations) {
         if (!r || !Number.isFinite(r.aqi) || r.aqi < 0) continue;
 
         const aqi = r.aqi;
-        let severity = "Moderate";
-        let severityClass = "moderate";
+        let severity;
+        let severityClass;
 
         if (aqi > 400) {
             severity = "Severe";
