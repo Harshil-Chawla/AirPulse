@@ -33,3 +33,12 @@ test('snapshot retains identity, zero values and missing-data columns safely', (
     assert.ok(csv.includes('"0"'));
     assert.equal(snapshotCSV([]).split('\r\n').length, 1);
 });
+
+import { readFavorites, toggleFavorite } from '../src/utils/favorites.js';
+test('favourites recover from corrupt storage and toggle without duplicates', () => {
+    assert.deepEqual(readFavorites({ getItem: () => 'invalid' }), []);
+    assert.deepEqual(readFavorites({ getItem: () => '[1,1,-2,"3",null]' }), [1]);
+    assert.deepEqual(readFavorites({ getItem: () => { throw Error('blocked'); } }), []);
+    assert.deepEqual(toggleFavorite([1], 2), [1, 2]);
+    assert.deepEqual(toggleFavorite([1, 2], 1), [2]);
+});

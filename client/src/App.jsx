@@ -6,6 +6,7 @@ import "./App.css";
 import { downloadSnapshot } from "./utils/exportSnapshot";
 import { downloadReadings } from "./utils/exportReadings";
 import { historyInWindow } from "./utils/historyWindow";
+import { readFavorites, toggleFavorite } from "./utils/favorites";
 import { filterStations } from "./utils/stationFilters";
 import AreaSummary from "./components/AreaSummary";
 const StationMap = lazy(() => import("./components/StationMap"));
@@ -56,6 +57,17 @@ function App() {
         setHistoricalReadings([]);
     };
     const [stations, setStations] = useState([]);
+    const [favorites, setFavorites] = useState(() => {
+        try { return readFavorites(window.localStorage); } catch { return []; }
+    });
+    const [favoritesOnly, setFavoritesOnly] = useState(false);
+    const [favoriteNotice, setFavoriteNotice] = useState("");
+    const saveFavorite = (id) => {
+        const updated = toggleFavorite(favorites, id);
+        setFavorites(updated);
+        try { window.localStorage.setItem("airpulse-favorites", JSON.stringify(updated)); setFavoriteNotice(""); }
+        catch { setFavoriteNotice("Favourites work for this session, but could not be saved in this browser."); }
+    };
     const [search, setSearch] = useState("");
     const [sort, setSort] = useState("name");
     const [stationFilter, setStationFilter] = useState("ALL");
@@ -422,7 +434,7 @@ function App() {
     ];
 
     // Filter monitoring stations
-    const filteredStations = filterStations(stations, { type: stationFilter, search, sort });
+    const filteredStations = filterStations(stations, { type: stationFilter, search, sort }).filter(s => !favoritesOnly || favorites.includes(s.id));
 
     // Find selected station
     const selectedStation = stations.find(
@@ -930,7 +942,12 @@ function App() {
                         <label>Sort by<select value={sort} onChange={e => setSort(e.target.value)}>
                             <option value="name">Station name</option><option value="aqi">Highest AQI first</option>
                         </select></label>
-                        <button type="button" onClick={() => { setSearch(""); setSort("name"); setStationFilter("ALL"); }}>Reset filters</button>
+                        <button type="button" onClick={() => { setSearch(""); setSort("name"); setStationFilter("ALL"); setFavoritesOnly(false); }}>Reset filters</button>
+                        <button aria-pressed={favoritesOnly} onClick={() => setFavoritesOnly(value => !value)}>{favoritesOnly ? "Show all stations" : "Show favourites"}</button>
+                        <button disabled={!selectedStation} aria-pressed={favorites.includes(selectedStation?.id)} onClick={() => saveFavorite(selectedStation.id)}>
+                            {favorites.includes(selectedStation?.id) ? "Remove selected favourite" : "Save selected station"}
+                        </button>
+                        {favoriteNotice && <span role="status">{favoriteNotice}</span>}
                         <button disabled={!filteredStations.length} onClick={() => downloadSnapshot(filteredStations)}>Download filtered stations CSV</button>
                         <span role="status">{filteredStations.length} matching stations</span>
                     </div>
@@ -1004,7 +1021,7 @@ function App() {
                                         }
                                     >
                                         <div className="station-info">
-                                            <h3>{station.name}</h3>
+                                            <h3>{favorites.includes(station.id) ? "★ " : ""}{station.name}</h3>
                                             <p>{station.city}, India</p>
                                             <div className="station-type-tags">
                                                 <span className="station-type">
