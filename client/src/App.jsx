@@ -4,6 +4,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import "./App.css";
 
 import { downloadReadings } from "./utils/exportReadings";
+import { filterStations } from "./utils/stationFilters";
 import AreaSummary from "./components/AreaSummary";
 const StationMap = lazy(() => import("./components/StationMap"));
 
@@ -52,6 +53,8 @@ function App() {
         setHistoricalReadings([]);
     };
     const [stations, setStations] = useState([]);
+    const [search, setSearch] = useState("");
+    const [sort, setSort] = useState("name");
     const [stationFilter, setStationFilter] = useState("ALL");
     const [loading, setLoading] = useState(true);
     const [refreshError, setRefreshError] = useState("");
@@ -406,12 +409,7 @@ function App() {
     ];
 
     // Filter monitoring stations
-    const filteredStations =
-        stationFilter === "ALL"
-            ? stations
-            : stations.filter(
-                (station) => station.type === stationFilter
-            );
+    const filteredStations = filterStations(stations, { type: stationFilter, search, sort });
 
     // Find selected station
     const selectedStation = stations.find(
@@ -899,6 +897,14 @@ function App() {
                         </div>
                     </div>
 
+                    <div className="dashboard-controls">
+                        <label>Search stations<input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Station or city" /></label>
+                        <label>Sort by<select value={sort} onChange={e => setSort(e.target.value)}>
+                            <option value="name">Station name</option><option value="aqi">Highest AQI first</option>
+                        </select></label>
+                        <button type="button" onClick={() => { setSearch(""); setSort("name"); setStationFilter("ALL"); }}>Reset filters</button>
+                        <span role="status">{filteredStations.length} matching stations</span>
+                    </div>
                     <div className="station-filters">
                         <button
                             className={

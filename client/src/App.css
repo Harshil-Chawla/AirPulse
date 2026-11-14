@@ -2941,3 +2941,9 @@ button {
 
 
 
+.dashboard-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin: 16px 0; }
+.dashboard-controls label { display: flex; flex-direction: column; gap: 6px; color: #cbd5e1; }
+.dashboard-controls input, .dashboard-controls select, .dashboard-controls button { background: #17283b; color: #fff; border: 1px solid #64748b; padding: 10px 14px; border-radius: 8px; max-width: 100%; }
+.dashboard-controls button { cursor: pointer; }
+.dashboard-controls button:disabled { opacity: .5; cursor: not-allowed; }
+.dashboard-controls :focus-visible { outline: 3px solid #5eead4; outline-offset: 2px; }
