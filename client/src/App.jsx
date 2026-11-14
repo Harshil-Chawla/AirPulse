@@ -4,6 +4,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import "./App.css";
 
 import { downloadReadings } from "./utils/exportReadings";
+import { historyInWindow } from "./utils/historyWindow";
 import { filterStations } from "./utils/stationFilters";
 import AreaSummary from "./components/AreaSummary";
 const StationMap = lazy(() => import("./components/StationMap"));
@@ -63,6 +64,7 @@ function App() {
     const [moving, setMoving] = useState(false);
     const [droneMoving, setDroneMoving] = useState(false);
     const [selectedStationId, setSelectedStationId] = useState("");
+    const [historyHours, setHistoryHours] = useState("all");
     const [historicalReadings, setHistoricalReadings] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
     const [historyError, setHistoryError] = useState("");
@@ -425,6 +427,7 @@ function App() {
         (station) => String(station.id) === String(selectedStationId)
     );
 
+    const displayedHistory = historyInWindow(historicalReadings, historyHours);
     const selectedReading = selectedStation?.readings?.[0];
 
     if (loading) {
@@ -761,17 +764,25 @@ function App() {
                             </select>
                         </div>
 
-                        <button className="movement-button history-export-btn" disabled={historyLoading || !!historyError || !historicalReadings.length}
-                            onClick={() => downloadReadings(historicalReadings, selectedStationId)}>
+                        <button className="movement-button history-export-btn" disabled={historyLoading || !!historyError || !displayedHistory.length}
+                            onClick={() => downloadReadings(displayedHistory, selectedStationId)}>
                             <span>↓</span> Export displayed history (up to 200 readings)
                         </button>
+                    </div>
+
+                    <div className="dashboard-controls">
+                        <label>History window<select value={historyHours} onChange={e => setHistoryHours(e.target.value)}>
+                            <option value="all">All loaded readings</option><option value="1">Last hour</option>
+                            <option value="6">Last 6 hours</option><option value="24">Last 24 hours</option>
+                        </select></label>
+                        <span>{displayedHistory.length} of {historicalReadings.length} loaded readings. Maximum 200; older history may not be loaded.</span>
                     </div>
                     {historyLoading ? (
                         <p>Loading historical readings...</p>
                     ) : historyError ? (
                         <p className="history-error">{historyError}</p>
                     ) : (
-                        <AQIChart readings={historicalReadings} />
+                        <AQIChart readings={displayedHistory} />
                     )}
                 </section>
 

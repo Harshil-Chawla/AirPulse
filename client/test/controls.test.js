@@ -8,3 +8,11 @@ test('station search combines city and type without changing source order', () =
     assert.equal(rows[0].id, 1);
     assert.equal(filterStations(rows, { search: 'Mumbai' }).length, 0);
 });
+
+import { historyInWindow } from '../src/utils/historyWindow.js';
+test('history windows exclude future and invalid dates and include boundary', () => {
+    const now = Date.parse('2026-11-14T12:00:00Z');
+    const rows = ['11:00:00', '10:59:59', '12:00:01'].map(time => ({ recordedAt: `2026-11-14T${time}Z` }));
+    assert.equal(historyInWindow([...rows, { recordedAt: 'bad' }], '1', now).length, 1);
+    assert.equal(historyInWindow(rows, 'all', now), rows);
+});
