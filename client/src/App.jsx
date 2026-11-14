@@ -68,6 +68,7 @@ function App() {
     const [historyError, setHistoryError] = useState("");
     const [movementTrails, setMovementTrails] = useState({});
     const [lastUpdated, setLastUpdated] = useState(null);
+    const [autoRefresh, setAutoRefresh] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
     // Load stations initially
@@ -180,13 +181,19 @@ function App() {
     // Automatically refresh dashboard every 30 seconds
 
     useEffect(() => {
+        if (!autoRefresh) return;
+        let cancelled = false;
+        let busy = false;
         const refreshDashboard = async () => {
+            if (busy) return;
+            busy = true;
             // Cancel any in-flight readings fetch from a previous refresh
             if (refreshAbortRef.current) refreshAbortRef.current.abort();
             const controller = new AbortController();
             refreshAbortRef.current = controller;
             try {
                 const updatedStations = await fetchStations();
+                if (cancelled) return;
                 setStations(updatedStations);
 
                 if (selectedStationId) {
@@ -194,24 +201,26 @@ function App() {
                         selectedStationId,
                         controller.signal
                     );
-                    if (selectionRef.current === selectedStationId) { setHistoricalReadings(updatedHistory); setHistoryError(""); }
+                    if (!cancelled && selectionRef.current === selectedStationId) { setHistoricalReadings(updatedHistory); setHistoryError(""); }
                 }
 
+                if (cancelled) return;
                 // Update timestamp after successful refresh
                 setLastUpdated(new Date());
                 setRefreshError("");
 
             } catch (err) {
                 if (err.name === "AbortError") return;
+                if (cancelled) return;
                 setRefreshError("Refresh failed. Showing previously loaded data.");
                 console.error("Dashboard refresh failed:", err);
-            }
+            } finally { busy = false; }
         };
 
         const intervalId = setInterval(refreshDashboard, 30000);
 
-        return () => clearInterval(intervalId);
-    }, [selectedStationId]);
+        return () => { cancelled = true; clearInterval(intervalId); refreshAbortRef.current?.abort(); };
+    }, [selectedStationId, autoRefresh]);
 
 
     // Simulate mobile station movement
@@ -528,6 +537,10 @@ function App() {
                           {refreshing ? "Refreshing..." : "↻ Refresh"}
                       </button>
 
+                      <button className="refresh-button" aria-pressed={!autoRefresh} onClick={() => setAutoRefresh(value => !value)}>
+                          {autoRefresh ? "Pause auto-refresh" : "Resume auto-refresh"}
+                      </button>
+                      <span role="status">{autoRefresh ? "Updates every 30 seconds" : "Auto-refresh paused"}</span>
                       <div className="last-updated">
                           <span>Last updated</span>
                           <strong>
