@@ -23,3 +23,13 @@ test('map focus prefers latest location and rejects invalid coordinates', () => 
     assert.equal(stationPosition({ latitude: 91, longitude: 77 }), null);
     assert.equal(stationPosition(null), null);
 });
+
+import { snapshotCSV } from '../src/utils/exportSnapshot.js';
+test('snapshot retains identity, zero values and missing-data columns safely', () => {
+    const csv = snapshotCSV([{ id: 7, name: '=formula', city: 'New, Delhi', type: 'MOBILE', latitude: 0, longitude: 0 }]);
+    assert.ok(csv.includes('"7"'));
+    assert.ok(csv.includes('"New, Delhi"'));
+    assert.ok(csv.includes('"\' =formula"'));
+    assert.ok(csv.includes('"0"'));
+    assert.equal(snapshotCSV([]).split('\r\n').length, 1);
+});

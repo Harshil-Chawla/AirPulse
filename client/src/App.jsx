@@ -3,6 +3,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from "react";
 
 import "./App.css";
 
+import { downloadSnapshot } from "./utils/exportSnapshot";
 import { downloadReadings } from "./utils/exportReadings";
 import { historyInWindow } from "./utils/historyWindow";
 import { filterStations } from "./utils/stationFilters";
@@ -930,6 +931,7 @@ function App() {
                             <option value="name">Station name</option><option value="aqi">Highest AQI first</option>
                         </select></label>
                         <button type="button" onClick={() => { setSearch(""); setSort("name"); setStationFilter("ALL"); }}>Reset filters</button>
+                        <button disabled={!filteredStations.length} onClick={() => downloadSnapshot(filteredStations)}>Download filtered stations CSV</button>
                         <span role="status">{filteredStations.length} matching stations</span>
                     </div>
                     <div className="station-filters">

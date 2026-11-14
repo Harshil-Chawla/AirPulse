@@ -4,11 +4,15 @@ export function readingsToCSV(readings) {
     return [columns.join(","), ...readings.map(r => columns.map(key => escape(r[key])).join(","))].join("\r\n");
 }
 
-export function downloadReadings(readings, stationId) {
-    const url = URL.createObjectURL(new Blob([readingsToCSV(readings)], { type: "text/csv;charset=utf-8" }));
+export function saveCSV(csv, filename) {
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     const link = document.createElement("a");
     link.href = url;
-    link.download = `station-${stationId}-readings.csv`;
+    link.download = filename;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+export function downloadReadings(readings, stationId) {
+    saveCSV(readingsToCSV(readings), `station-${stationId}-readings.csv`);
 }
