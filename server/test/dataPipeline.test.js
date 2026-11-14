@@ -143,3 +143,25 @@ test('aggregateReadings produces accurate summary metrics and handles empty/part
     // SO2 stats: only 1 reading had SO2
     assert.deepEqual(agg.summary.so2, { min: 15.0, max: 15.0, avg: 15, count: 1 });
 });
+
+test('missing and nonnumeric coordinates cannot become a real zero location', () => {
+    const valid = { stationId: 1, latitude: 28, longitude: 77 };
+    for (const field of ['latitude', 'longitude']) {
+        for (const value of [null, undefined, '', '  ', true, false, [], {}, Infinity]) {
+            assert.throws(() => normalizeReading({ ...valid, [field]: value }), /Latitude|Longitude/);
+        }
+    }
+    const zero = normalizeReading({ ...valid, latitude: 0, longitude: '0' });
+    assert.equal(zero.latitude, 0);
+    assert.equal(zero.longitude, 0);
+    assert.throws(() => normalizeReading([]), /object/);
+});
+test('boolean, blank and structured pollutant or AQI data stays unavailable', () => {
+    for (const value of [true, false, '  ', [], {}, null, undefined]) {
+        assert.equal(normalizePollutantValue(value), null);
+        const reading = normalizeReading({ stationId: 1, latitude: 28, longitude: 77, aqi: value });
+        assert.equal(reading.aqi, null);
+    }
+    assert.equal(normalizePollutantValue('0'), 0);
+    assert.equal(normalizePollutantValue('12.3'), 12.3);
+});

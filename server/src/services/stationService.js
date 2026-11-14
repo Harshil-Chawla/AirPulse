@@ -1,7 +1,8 @@
 import { prisma } from "../lib/prisma.js";
 
-// LRU / TTL Cache for repeated recent station lookups (avoids duplicate round trips)
+// Bounded FIFO / TTL cache for repeated recent station lookups (avoids duplicate round trips)
 const stationExistenceCache = new Map();
+const STATION_CACHE_MAX_ENTRIES = 1000;
 const STATION_CACHE_TTL_MS = 60000; // 60 seconds
 
 async function checkStationExists(stationId) {
@@ -18,6 +19,13 @@ async function checkStationExists(stationId) {
         select: { id: true },
     });
 
+    // Drop expired entries and cap memory when clients request many different IDs.
+    for (const [id, entry] of stationExistenceCache) {
+        if (now - entry.timestamp >= STATION_CACHE_TTL_MS) stationExistenceCache.delete(id);
+    }
+    if (!stationExistenceCache.has(stationId) && stationExistenceCache.size >= STATION_CACHE_MAX_ENTRIES) {
+        stationExistenceCache.delete(stationExistenceCache.keys().next().value);
+    }
     stationExistenceCache.set(stationId, {
         exists: !!station,
         timestamp: now,

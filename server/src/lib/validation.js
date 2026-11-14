@@ -19,7 +19,14 @@ export function historyOptions(query = {}) {
         if (!Number.isFinite(since.getTime())) throw new Error("Invalid start date");
         if (since.getTime() > Date.now() + 60000) throw new Error("Start date cannot be in the future");
     }
-    return { limit, since };
+    let until;
+    if (query.until !== undefined) {
+        if (typeof query.until !== "string") throw new Error("Invalid end date");
+        until = new Date(query.until);
+        if (!Number.isFinite(until.getTime())) throw new Error("Invalid end date");
+    }
+    if (since && until && since > until) throw new Error("Start date must not be after end date");
+    return { limit, since, until };
 }
 
 const VALID_SOURCES = new Set(["CPCB", "OPENAQ", "OPEN_METEO", "SIMULATED"]);
@@ -31,9 +38,14 @@ const POLLUTANTS = ["pm25", "pm10", "no2", "so2", "co", "o3"];
  * - Filters NaN, non-finite or non-numeric values -> returns null
  * - Rounds valid non-negative measurements to 1 decimal place
  */
+function measurementNumber(value) {
+    if (typeof value !== "number" && typeof value !== "string") return NaN;
+    if (typeof value === "string" && value.trim() === "") return NaN;
+    return Number(value);
+}
+
 export function normalizePollutantValue(value) {
-    if (value === null || value === undefined || value === "") return null;
-    const num = Number(value);
+    const num = measurementNumber(value);
     if (!Number.isFinite(num) || num < 0) return null;
     return Math.round(num * 10) / 10;
 }
@@ -44,7 +56,7 @@ export function normalizePollutantValue(value) {
  * coordinate bounding, and timestamp freshness.
  */
 export function normalizeReading(raw = {}) {
-    if (typeof raw !== "object" || raw === null) {
+    if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
         throw new Error("Reading payload must be an object");
     }
 
@@ -52,12 +64,12 @@ export function normalizeReading(raw = {}) {
     const id = stationId(raw.stationId);
 
     // Coordinates validation and bounded normalization
-    const lat = Number(raw.latitude);
+    const lat = measurementNumber(raw.latitude);
     if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
         throw new Error("Latitude must be a valid number between -90 and 90");
     }
 
-    let lon = Number(raw.longitude);
+    let lon = measurementNumber(raw.longitude);
     if (!Number.isFinite(lon)) {
         throw new Error("Longitude must be a valid finite number");
     }
@@ -67,7 +79,7 @@ export function normalizeReading(raw = {}) {
     // AQI validation & clamping [0, 500]
     let aqi = null;
     if (raw.aqi !== null && raw.aqi !== undefined && raw.aqi !== "") {
-        const aqiNum = Number(raw.aqi);
+        const aqiNum = measurementNumber(raw.aqi);
         if (Number.isFinite(aqiNum) && aqiNum >= 0) {
             aqi = Math.max(0, Math.min(500, Math.round(aqiNum)));
         }

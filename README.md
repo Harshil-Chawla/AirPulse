@@ -91,3 +91,12 @@ git rebase --onto origin/main 7fc2468 main
 ```
 
 If there is a conflict, stop and review it with the teammate. Run the full application checks above before `git push origin main`. This preserves remote history and excludes the local ZIP snapshot commit. If remote main changes again, fetch and rebase again rather than force-pushing.
+
+
+## Submission corrections
+
+History and statistics endpoints accept an inclusive `until` timestamp alongside `since`, and reject reversed date ranges. Reading normalization rejects missing/blank/boolean coordinates instead of silently turning them into zero; valid zero coordinates remain supported. Boolean and structured pollutant/AQI values stay unavailable. The station-existence cache is capped at 1000 entries; a cached existence result can still be stale for up to 60 seconds after an external database change.
+
+The modules under `server/src/analytics` for fusion, source attribution, forecasting and reliability scoring are tested library prototypes. They are not currently exposed through API routes. Real sensor ingestion and external data-provider integration remain future work. Source attribution and coverage suggestions are exploratory heuristics, not validated field measurements.
+
+The submission build, lint and automated tests are checked locally. The live API/database integration test requires a separately running, configured PostgreSQL-backed API and is skipped unless `AIRPULSE_TEST_URL` is set. Browser interaction and physical sensor behavior have not been verified in this environment.

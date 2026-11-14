@@ -16,3 +16,14 @@ test('history validates dates and rejects future or non-string timestamps', () =
     assert.throws(() => historyOptions({ since: new Date(Date.now() + 120000).toISOString() }), /future/);
     assert.equal(historyOptions({ since: '2026-11-13T00:00:00Z' }).since.toISOString(), '2026-11-13T00:00:00.000Z');
 });
+
+test('history accepts end dates and rejects invalid or reversed ranges', () => {
+    const since = '2026-11-13T00:00:00Z';
+    const until = '2026-11-14T00:00:00Z';
+    const options = historyOptions({ since, until });
+    assert.equal(options.until.toISOString(), '2026-11-14T00:00:00.000Z');
+    assert.throws(() => historyOptions({ until: 'invalid' }), /end date/);
+    assert.throws(() => historyOptions({ until: 123 }), /end date/);
+    assert.throws(() => historyOptions({ since: until, until: since }), /after/);
+    assert.equal(historyOptions({ since, until: since }).since.getTime(), Date.parse(since));
+});

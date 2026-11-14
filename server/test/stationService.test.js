@@ -73,3 +73,14 @@ test('performance optimization: station lookup cache eliminates redundant DB rou
     await service.getStationReadings(42, { limit: 15, until });
     assert.deepEqual(query.where.recordedAt, { lte: until });
 });
+
+test('station lookup cache evicts old entries when its capacity is reached', async () => {
+    service.clearStationCache();
+    station = { id: 1 };
+    findUniqueCalls = 0;
+    for (let id = 1; id <= 1001; id++) await service.getStationReadings(id, { limit: 1 });
+    assert.equal(findUniqueCalls, 1001);
+    await service.getStationReadings(1, { limit: 1 });
+    assert.equal(findUniqueCalls, 1002, 'The oldest cached entry was evicted');
+    service.clearStationCache();
+});
