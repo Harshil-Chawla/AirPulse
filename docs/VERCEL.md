@@ -28,3 +28,6 @@ Import the same repository as `airpulse`, choosing `client` as Root Directory an
 Verify station listing, history, both simulation buttons if enabled, and CSV export on the actual deployed frontend. Preview deployment domains also require an explicit matching CORS origin; the default setup supports the one origin specified by CLIENT_ORIGIN.
 
 The frontend and backend builds can be verified locally. Deployment, hosted migrations and end-to-end checks must still be completed against the configured accounts; adding these files alone does not publish the app.
+
+
+The backend pins Node 24 and `npm run build` generates Prisma then emits JavaScript runtime modules. Vercel and plain Node import `src/generated/prisma/client.js`; generated `.js` files are ignored in Git and rebuilt on deploy. Local npm dev/start/seed commands run this build automatically. If calling seed directly through Node, run `npm run build` first.

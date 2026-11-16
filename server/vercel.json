@@ -2,5 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "express",
   "installCommand": "npm ci",
-  "buildCommand": "npx prisma generate"
+  "buildCommand": "npm run build"
 }

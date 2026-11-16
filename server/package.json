@@ -7,7 +7,11 @@
     "test": "node --test test/*.test.js",
     "dev": "tsx watch src/server.js",
     "start": "tsx src/server.js",
-    "seed": "tsx prisma/seed.js"
+    "seed": "tsx prisma/seed.js",
+    "build": "prisma generate && node scripts/build-prisma-client.mjs",
+    "predev": "npm run build",
+    "prestart": "npm run build",
+    "preseed": "npm run build"
   },
   "keywords": [],
   "author": "",
@@ -25,5 +29,8 @@
     "nodemon": "^3.1.14",
     "prisma": "^7.10.1",
     "tsx": "^4.23.15"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }
