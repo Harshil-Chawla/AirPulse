@@ -1,4 +1,4 @@
-Actual DE SQL execution: 2026-11-22T16:21:45.945Z
+Actual DE SQL execution: 2026-11-22T17:00:37.313Z
 Dataset: isolated airpulse_de_recording schema; rolled back after execution.
 -- Q01 — Delhi mobile stations
 SELECT: 1 row(s)
