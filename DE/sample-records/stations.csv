@@ -1,0 +1,4 @@
+id,name,type,city,latitude,longitude
+1,DE Fixed Delhi,FIXED,Delhi,28.6139,77.209
+2,DE Mobile Delhi,MOBILE,Delhi,28.62,77.215
+3,DE Drone Delhi,DRONE,Delhi,28.63,77.22

@@ -1,0 +1,28 @@
+erDiagram
+    Station ||--o{ Reading : produces
+    Station {
+        Int id PK
+        String name
+        StationType type
+        String city
+        Float latitude
+        Float longitude
+        DateTime createdAt
+        DateTime updatedAt
+    }
+    Reading {
+        Int id PK
+        Int stationId FK
+        Float pm25_nullable
+        Float pm10_nullable
+        Float no2_nullable
+        Float so2_nullable
+        Float co_nullable
+        Float o3_nullable
+        Int aqi_nullable
+        Float latitude
+        Float longitude
+        DataSource source
+        DateTime recordedAt
+        DateTime createdAt
+    }

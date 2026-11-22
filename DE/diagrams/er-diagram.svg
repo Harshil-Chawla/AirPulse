@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="490" viewBox="0 0 1100 490">
+<rect width="1100" height="490" fill="#f8fafc"/>
+<text x="40" y="38" font-family="Arial" font-size="24" fill="#0f172a">AirPulse — implemented PostgreSQL ER diagram</text>
+<rect x="40" y="70" width="420" height="335" rx="10" fill="white" stroke="#334155" stroke-width="2"/>
+<text x="58" y="103" font-family="Arial" font-size="22" fill="#0f172a">Station</text>
+<text x="58" y="140" font-family="Arial" font-size="16" fill="#1e293b">id : integer [PK]</text>
+<text x="58" y="171" font-family="Arial" font-size="16" fill="#1e293b">name : text</text>
+<text x="58" y="202" font-family="Arial" font-size="16" fill="#1e293b">type : StationType</text>
+<text x="58" y="233" font-family="Arial" font-size="16" fill="#1e293b">city : text</text>
+<text x="58" y="264" font-family="Arial" font-size="16" fill="#1e293b">latitude, longitude : float8</text>
+<text x="58" y="295" font-family="Arial" font-size="16" fill="#1e293b">createdAt, updatedAt : timestamp</text>
+<rect x="635" y="70" width="420" height="335" rx="10" fill="white" stroke="#334155" stroke-width="2"/>
+<text x="653" y="103" font-family="Arial" font-size="22" fill="#0f172a">Reading</text>
+<text x="653" y="140" font-family="Arial" font-size="16" fill="#1e293b">id : integer [PK]</text>
+<text x="653" y="171" font-family="Arial" font-size="16" fill="#1e293b">stationId : integer [FK → Station.id]</text>
+<text x="653" y="202" font-family="Arial" font-size="16" fill="#1e293b">pm25, pm10, no2 : float8, nullable</text>
+<text x="653" y="233" font-family="Arial" font-size="16" fill="#1e293b">so2, co, o3 : float8, nullable</text>
+<text x="653" y="264" font-family="Arial" font-size="16" fill="#1e293b">aqi : integer, nullable</text>
+<text x="653" y="295" font-family="Arial" font-size="16" fill="#1e293b">latitude, longitude : float8</text>
+<text x="653" y="326" font-family="Arial" font-size="16" fill="#1e293b">source : DataSource</text>
+<text x="653" y="357" font-family="Arial" font-size="16" fill="#1e293b">recordedAt, createdAt : timestamp</text>
+<path d="M460 224 H635 M475 211 V237 M487 211 V237 M618 224 L635 210 M618 224 L635 238" fill="none" stroke="#0f766e" stroke-width="2"/>
+<circle cx="604" cy="224" r="7" fill="white" stroke="#0f766e" stroke-width="2"/>
+<text x="490" y="190" font-family="Arial" font-size="16">produces</text>
+<text x="40" y="447" font-family="Arial" font-size="16">Station 1 → Reading 0..many; each Reading references exactly one Station.</text>
+<text x="40" y="475" font-family="Arial" font-size="16">Station = base coordinates; Reading = measurement coordinates. No M:N relationship is needed.</text>
+</svg>

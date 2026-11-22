@@ -1,0 +1,28 @@
+{
+  "source_commit": "90f4891fcf5b9ab0bb49f4fa20e2739c09035f1a",
+  "files_sha256": {
+    "01-database-choice.md": "77ffbc50bbf80a4bd607ea8d0a9f5df940d9023f707db581af7469178fbbe2bc",
+    "02-data-model.md": "24d98df8584017285d334fc263c0aafcdc53d7a945132ad2594fe53b531fa38f",
+    "03-normalization.md": "430ecb42adfaf9392bacee9a633975b78e6ff668387ae58fbbda756c776357f5",
+    "04-query-guide.md": "aef41554e3aefe78100b346c7e454bb0f24939b6bc670bbe9b6bbcf5d3aa9a3e",
+    "05-integration.md": "f2530b7273ca71616936768a34586a4749b887fb56abb4aad016bf2cc55d7ebe",
+    "06-integrity-performance.md": "e76c9a979dd0c0c25f90b1309ac26281691e978a77b28d8ac289cb55490ac333",
+    "07-video-script.md": "c776c58f5c70ed1d20bb6c1934cc03fb7b90955b530ef58c871b6ab7b7a51c5e",
+    "OPEN-FIRST.html": "50c5d802b6553d2e5b14a895817ac1db4f281053123fb5171171125215ef5b9f",
+    "README.md": "9d42be217a1f7a46953ff01a98e6dba3525e282fdaaafaa2fd0881ab64936699",
+    "SUBMISSION-CHECKLIST.md": "89426830fe83b2527dbfe6beaae33d802fc038cff51a03ce671df5e03a8d72b7",
+    "diagrams/er-diagram.mmd": "1f2ae65e0434b2e4403c239ce4b7c8805a8e8fdf73a66ba0b7f221187b02181f",
+    "diagrams/er-diagram.svg": "fee1cb6357ede43a5234e5c348a3af713ce248a491b0886fbd6a584502ab019e",
+    "evidence/CAPTURE-REQUIRED.md": "81cd4844a7ef001c0f99c76a1400d2fce6f2e16efd552f27b37470024acb7bad",
+    "evidence/automated-tests.txt": "7961aeedc98bcbe4dc4a99cbf3fc5c9c24c2957d989e13edea3fec267a1f5d70",
+    "queries.sql": "97e1f89c7e08a01678bdd2b61b0e36aa1c164b59e09e02b84209af43ea3b562f",
+    "run-queries.mjs": "b2b4a8a0364e1e9c3726ac9ecf59920da9c543bcbd7f00e166e9dd34a898daea",
+    "sample-records/README.md": "56f16bbfc6a5dfd1cd0a3d98960209828b43dc56b92873018ce005b641b69e1d",
+    "sample-records/fixture.sql": "956fbdc4dfdc0ecd53064651a45891114f9cafb0e0f8a363d87ab5e9e07a9f8d",
+    "sample-records/readings.csv": "1067b027ff39f0706fa8c0f47bc453b5ab6894e9a040ec977e1b549f8c4e23ce",
+    "sample-records/stations.csv": "f62cda58d1609f19d0e4364f843951311b5e2468aadcd66bf4929153dd1eaacf",
+    "schema/migration.sql": "2d709610d7c69d4a2e0cd8f4cc8fb856df2b0c04a01130c61da9a1ef5735830d",
+    "schema/schema.prisma": "e17741b3372ea5e0d647be9737a92c7210aedc86ab12efaddb3e433703b0fe6d",
+    "schema/seed.js": "fe77b7b144c78e559ce9e7500ba91fb2364c23a8a474b946453303091040837c"
+  }
+}
