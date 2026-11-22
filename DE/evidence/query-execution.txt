@@ -1,0 +1,171 @@
+Actual DE SQL execution: 2026-11-22T16:21:45.945Z
+Dataset: isolated airpulse_de_recording schema; rolled back after execution.
+-- Q01 — Delhi mobile stations
+SELECT: 1 row(s)
+[
+  {
+    "id": 2,
+    "name": "DE Mobile Delhi",
+    "type": "MOBILE",
+    "city": "Delhi"
+  }
+]
+-- Q02 — Latest observation history
+SELECT: 3 row(s)
+[
+  {
+    "id": 4,
+    "stationId": 2,
+    "aqi": 200,
+    "recordedAt": "2026-11-14T04:31:00.000Z"
+  },
+  {
+    "id": 3,
+    "stationId": 3,
+    "aqi": 135,
+    "recordedAt": "2026-11-14T04:30:00.000Z"
+  },
+  {
+    "id": 2,
+    "stationId": 2,
+    "aqi": 190,
+    "recordedAt": "2026-11-14T04:30:00.000Z"
+  }
+]
+-- Q03 — Station and observation join
+SELECT: 4 row(s)
+[
+  {
+    "name": "DE Fixed Delhi",
+    "type": "FIXED",
+    "aqi": 165
+  },
+  {
+    "name": "DE Mobile Delhi",
+    "type": "MOBILE",
+    "aqi": 190
+  },
+  {
+    "name": "DE Drone Delhi",
+    "type": "DRONE",
+    "aqi": 135
+  },
+  {
+    "name": "DE Mobile Delhi",
+    "type": "MOBILE",
+    "aqi": 200
+  }
+]
+-- Q04 — Per-station summary including stations without observations
+SELECT: 3 row(s)
+[
+  {
+    "id": 1,
+    "name": "DE Fixed Delhi",
+    "reading_count": "1",
+    "average_aqi": "165.0",
+    "highest_aqi": 165
+  },
+  {
+    "id": 2,
+    "name": "DE Mobile Delhi",
+    "reading_count": "2",
+    "average_aqi": "195.0",
+    "highest_aqi": 200
+  },
+  {
+    "id": 3,
+    "name": "DE Drone Delhi",
+    "reading_count": "1",
+    "average_aqi": "135.0",
+    "highest_aqi": 135
+  }
+]
+-- Q05 — Repeated elevated observations
+SELECT: 1 row(s)
+[
+  {
+    "stationId": 2,
+    "elevated_count": "2"
+  }
+]
+-- Q06 — Latest reading from every reporting station
+SELECT: 3 row(s)
+[
+  {
+    "id": 1,
+    "name": "DE Fixed Delhi",
+    "aqi": 165,
+    "recordedAt": "2026-11-14T04:30:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "DE Mobile Delhi",
+    "aqi": 200,
+    "recordedAt": "2026-11-14T04:31:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "DE Drone Delhi",
+    "aqi": 135,
+    "recordedAt": "2026-11-14T04:30:00.000Z"
+  }
+]
+-- Q07 — Above-station-average readings
+SELECT: 1 row(s)
+[
+  {
+    "id": 4,
+    "stationId": 2,
+    "aqi": 200
+  }
+]
+-- Q08 — Measurement time range
+SELECT: 1 row(s)
+[
+  {
+    "id": 4,
+    "stationId": 2,
+    "aqi": 200
+  }
+]
+-- Q09 — Register a station
+INSERT: 1 row(s)
+[
+  {
+    "id": 900,
+    "name": "DE recording station"
+  }
+]
+-- Q10 — Correct station metadata
+UPDATE: 1 row(s)
+[
+  {
+    "id": 900,
+    "name": "DE recording station corrected"
+  }
+]
+-- Q11 — Record a measurement
+INSERT: 1 row(s)
+[
+  {
+    "id": 900,
+    "stationId": 900,
+    "aqi": 150
+  }
+]
+-- Q12 — Retire the demonstration station and verify cascade
+DELETE: 1 row(s)
+[
+  {
+    "id": 900,
+    "name": "DE recording station corrected"
+  }
+]
+SELECT: 1 row(s)
+[
+  {
+    "remaining_station_readings": "0"
+  }
+]
+ROLLBACK completed. No demonstration records or schema retained.
